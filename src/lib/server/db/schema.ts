@@ -42,7 +42,7 @@ export const suggestion = pgTable("suggestion", {
 	voterId: text("voter_id")
 		.references(() => user.id)
 		.array(),
-	tags: tags("tags").notNull(),
+	tags: tags("tags").notNull().array(),
 	status: status("status").notNull().default("pending"),
 	imageIds: text("image_ids")
 		.references(() => image.id)

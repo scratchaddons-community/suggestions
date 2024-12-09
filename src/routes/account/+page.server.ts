@@ -5,6 +5,7 @@ import * as auth from "$lib/server/auth";
 
 export const load = (async ({ locals: { session, user } }) => {
 	if (!session) redirect(302, "/");
+
 	return { user };
 }) satisfies PageServerLoad;
 
