@@ -14,7 +14,7 @@
 	}
 
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
-	const { session } = data;
+	const { session } = $derived(data);
 </script>
 
 <Header {session} />

@@ -12,13 +12,13 @@ export const load: PageServerLoad = async ({ url, cookies }) => {
 	const state = searchParams.get("state");
 	const privateCode = searchParams.get("privateCode");
 
-	const oAuthProvider = privateCode ? "scratch" : "github";
+	const oauthProvider = privateCode ? "scratch" : "github";
 
 	let oauthId;
 	let username;
 	let displayName;
 
-	if (oAuthProvider === "github") {
+	if (oauthProvider === "github") {
 		if (!code || !state) {
 			redirect(307, "/auth/error");
 		}
@@ -41,7 +41,7 @@ export const load: PageServerLoad = async ({ url, cookies }) => {
 		displayName = githubUser.name;
 	}
 
-	if (oAuthProvider === "scratch") {
+	if (oauthProvider === "scratch") {
 		await fetch(`https://auth.itinerary.eu.org/api/auth/verifyToken?privateCode=${privateCode}`, {
 			method: "GET",
 		})
@@ -65,6 +65,7 @@ export const load: PageServerLoad = async ({ url, cookies }) => {
 			oauthId,
 			username,
 			displayName,
+			oauthProvider,
 		});
 	}
 

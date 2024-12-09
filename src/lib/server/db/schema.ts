@@ -17,6 +17,7 @@ export const user = pgTable("user", {
 	oauthId: text("oauth_id").unique().notNull(), // ID from github OR scratch username
 	username: text("username").notNull(), // Github username OR scratch username
 	displayName: text("display_name"), // Autofilled with github display name, empty for scratch
+	oauthProvider: text("oauth_provider").notNull(), // Github or scratch
 });
 
 export const session = pgTable("session", {
@@ -47,6 +48,7 @@ export const suggestion = pgTable("suggestion", {
 	imageIds: text("image_ids")
 		.references(() => image.id)
 		.array(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).notNull().defaultNow(),
 });
 
 export type Session = typeof session.$inferSelect;

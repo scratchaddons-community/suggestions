@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { enhance } from "$app/forms";
 	import type { PageData } from "./$types";
 
 	let { data }: { data: PageData } = $props();
@@ -8,8 +9,9 @@
 <div class="account">
 	<h1>Hello {user?.displayName || user?.username}!</h1>
 
-	<form method="post">
-		<button>Log out</button>
+	<form method="POST" use:enhance>
+		<button formaction="?/logout">Log out</button>
+		<button formaction="?/add">Add mock suggestion</button>
 	</form>
 </div>
 
