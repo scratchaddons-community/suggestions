@@ -4,7 +4,7 @@ import { invalidateSession } from "$lib/server/auth";
 import * as auth from "$lib/server/auth";
 
 export const load = (async ({ locals: { session, user } }) => {
-	if (!session) redirect(302, "/");
+	if (!session) redirect(302, "/login");
 
 	return { user };
 }) satisfies PageServerLoad;

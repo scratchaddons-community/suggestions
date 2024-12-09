@@ -1,11 +1,13 @@
 import { redirect, type Actions } from "@sveltejs/kit";
-import type { PageServerLoad } from "./$types";
 import { generateState } from "arctic";
 import { github } from "$lib/server/auth";
 import { encodeBase64 } from "@oslojs/encoding";
+import type { PageServerLoad } from "./$types";
 
-export const load = (async ({ locals: { session, user } }) => {
-	return { session, user };
+export const load = (async ({ locals: { session } }) => {
+	if (session) redirect(302, "/account");
+
+	return {};
 }) satisfies PageServerLoad;
 
 export const actions: Actions = {

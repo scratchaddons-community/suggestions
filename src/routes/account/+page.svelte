@@ -3,12 +3,21 @@
 
 	let { data }: { data: PageData } = $props();
 	const { user } = data;
-
-	console.log(user);
 </script>
 
-<h1>Hello {user?.displayName || user?.username}!</h1>
+<div class="account">
+	<h1>Hello {user?.displayName || user?.username}!</h1>
 
-<form method="post">
-	<button>Log out</button>
-</form>
+	<form method="post">
+		<button>Log out</button>
+	</form>
+</div>
+
+<style>
+	.account {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+	}
+</style>

@@ -47,8 +47,6 @@ export const load: PageServerLoad = async ({ url, cookies }) => {
 		})
 			.then((response) => response.json())
 			.then((data) => {
-				console.log("🚀 ~ .then ~ data:", data);
-
 				if (data.valid === true && data.redirect === "http://localhost:5173/auth/callback/") {
 					oauthId = data.username;
 					username = data.username;
@@ -58,8 +56,6 @@ export const load: PageServerLoad = async ({ url, cookies }) => {
 				}
 			});
 	}
-
-	console.log({ oauthId, username, displayName });
 
 	let [dbUser] = await db.select().from(table.user).where(eq(table.user.oauthId, oauthId));
 
