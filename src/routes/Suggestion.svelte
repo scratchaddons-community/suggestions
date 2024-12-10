@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { enhance } from "$app/forms";
 	import potat from "$lib/images/Potat.svg";
 	import type { Image, Suggestion, User } from "$lib/server/db/schema";
 	import { fade, fly } from "svelte/transition";
@@ -64,12 +65,15 @@
 			<p>{suggestion.suggestion.description}</p>
 		</div>
 
-		<div class="votes">
-			<img src={potat} alt="potat" />
-			{#if suggestion.suggestion.voterId}
-				<span class="votes-count">{suggestion.suggestion.voterId.length}</span>
-			{/if}
-		</div>
+		<form method="POST" action="/vote?/vote" use:enhance>
+			<input type="hidden" name="suggestionId" value={suggestion.suggestion.id} />
+			<button class="votes omit-styles">
+				<img src={potat} alt="potat" />
+				{#if suggestion.suggestion.voterIds}
+					<span class="votes-count">{suggestion.suggestion.voterIds.length}</span>
+				{/if}
+			</button>
+		</form>
 	</div>
 
 	{#await imagesCall then images}
@@ -165,6 +169,7 @@
 				background-color 200ms,
 				border 200ms;
 			border: transparent 1px solid;
+			cursor: pointer;
 
 			&:hover {
 				border: color-mix(in srgb, var(--text) 80%, transparent) 1px solid;
@@ -172,6 +177,8 @@
 
 			.votes-count {
 				font-size: 1.1rem;
+				color: var(--text);
+				margin-left: 0.1rem;
 			}
 
 			img {

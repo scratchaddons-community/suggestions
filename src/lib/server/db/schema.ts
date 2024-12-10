@@ -40,7 +40,7 @@ export const suggestion = pgTable("suggestion", {
 		.references(() => user.id),
 	title: text("title").notNull(),
 	description: text("description").notNull().default("*no description given*"),
-	voterId: text("voter_id")
+	voterIds: text("voter_ids")
 		.references(() => user.id)
 		.array(),
 	tags: tags("tags").notNull().array(),

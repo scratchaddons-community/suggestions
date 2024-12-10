@@ -3,8 +3,12 @@ import { db } from "./server/db";
 import type { Image, Suggestion } from "./server/db/schema";
 
 export async function mockSuggestion(userId: string): Promise<Suggestion> {
-	const imageIds = getRandomNItems(
-		(await db.select({ id: table.image.id }).from(table.image)).map((image) => image.id),
+	const imageIds = (await db.select({ id: table.image.id }).from(table.image)).map(
+		(image) => image.id,
+	);
+
+	const voterIds = (await db.select({ id: table.user.id }).from(table.user)).map(
+		(suggestion) => suggestion.id,
 	);
 
 	function getRandomNItems<T>(arr: T[], n?: number): T[] {
@@ -20,8 +24,8 @@ export async function mockSuggestion(userId: string): Promise<Suggestion> {
 		authorId: userId,
 		title: `Suggestion ${(Math.random() * 10000).toFixed(0)}`,
 		description: `Description ${(Math.random() * 10000).toFixed(0)}`,
-		voterId: null,
-		imageIds,
+		voterIds: getRandomNItems(voterIds as unknown as string[]),
+		imageIds: getRandomNItems(imageIds),
 		tags: (() => {
 			const tags: Suggestion["tags"] = ["website", "editor", "other"];
 			return [tags[Math.floor(Math.random() * tags.length)]];

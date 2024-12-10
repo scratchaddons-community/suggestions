@@ -11,7 +11,7 @@ body {
 		color 200ms;
 }
 
-button {
+button:not(.omit-styles) {
 	border: none;
 	padding: 0.5rem;
 	border-radius: 0.5rem;
@@ -31,7 +31,7 @@ button {
 	}
 }
 
-header button {
+header button:not(.omit-styles) {
 	background-color: transparent;
 
 	&:hover {

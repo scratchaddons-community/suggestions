@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { dev } from "$app/environment";
 	import Load from "$lib/icons/Load.svelte";
 	import { fade } from "svelte/transition";
 	import Suggestion from "./Suggestion.svelte";
