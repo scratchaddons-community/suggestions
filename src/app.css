@@ -1,41 +1,41 @@
 html,
 body {
-  background-color: var(--background);
-  color: var(--text);
-  margin: 0;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  scrollbar-gutter: stable both-edges;
+	background-color: var(--background);
+	color: var(--text);
+	margin: 0;
+	font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+	scrollbar-gutter: stable both-edges;
 
-  transition:
-    background-color 200ms,
-    color 200ms;
+	transition:
+		background-color 200ms,
+		color 200ms;
 }
 
 button {
-  border: none;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-  cursor: pointer;
-  transition:
-    background-color 200ms,
-    color 200ms,
-    transform 200ms,
-    box-shadow 200ms;
+	border: none;
+	padding: 0.5rem;
+	border-radius: 0.5rem;
+	font-size: 1rem;
+	cursor: pointer;
+	transition:
+		background-color 200ms,
+		color 200ms,
+		transform 200ms,
+		box-shadow 200ms;
 
-  background-color: var(--brand);
-  color: var(--text-on-brand);
+	background-color: var(--brand);
+	color: var(--text-on-brand);
 
-  &:hover {
-    transform: scale(1.1);
-  }
+	&:hover {
+		transform: scale(1.1);
+	}
 }
 
 header button {
-  background-color: transparent;
+	background-color: transparent;
 
-  &:hover {
-    background-color: color-mix(in srgb, white 50%, transparent);
-    color: var(--text);
-  }
+	&:hover {
+		background-color: color-mix(in srgb, white 50%, transparent);
+		color: var(--text);
+	}
 }
