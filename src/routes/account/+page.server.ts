@@ -20,8 +20,8 @@ export const actions: Actions = {
 		}
 		redirect(302, "/");
 	},
-	suggestion: async () => {
-		await db.insert(table.suggestion).values(await mockSuggestion());
+	suggestion: async ({ locals: { session } }) => {
+		await db.insert(table.suggestion).values(await mockSuggestion(session?.userId as string));
 	},
 	image: async () => {
 		await db.insert(table.image).values(await mockImage());

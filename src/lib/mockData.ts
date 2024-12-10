@@ -2,7 +2,7 @@ import { table } from "$lib";
 import { db } from "./server/db";
 import type { Image, Suggestion } from "./server/db/schema";
 
-export async function mockSuggestion(): Promise<Suggestion> {
+export async function mockSuggestion(userId: string): Promise<Suggestion> {
 	const imageIds = getRandomNItems(
 		(await db.select({ id: table.image.id }).from(table.image)).map((image) => image.id),
 	);
@@ -17,7 +17,7 @@ export async function mockSuggestion(): Promise<Suggestion> {
 	}
 	return {
 		id: crypto.randomUUID(),
-		authorId: (await db.select({ id: table.user.id }).from(table.user))[0].id,
+		authorId: userId,
 		title: `Suggestion ${(Math.random() * 10000).toFixed(0)}`,
 		description: `Description ${(Math.random() * 10000).toFixed(0)}`,
 		voterId: null,
@@ -44,8 +44,8 @@ export async function mockSuggestion(): Promise<Suggestion> {
 }
 
 export async function mockImage(): Promise<Image> {
-	const width = Math.floor(Math.random() * 1000);
-	const height = Math.floor(Math.random() * 1000);
+	const width = Math.floor(Math.random() * 500) + 300;
+	const height = Math.floor(Math.random() * 500) + 300;
 	return {
 		id: crypto.randomUUID(),
 		url: `https://placehold.co/${width}x${height}`,

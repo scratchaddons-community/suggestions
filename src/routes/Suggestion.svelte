@@ -195,7 +195,6 @@
 				justify-content: center;
 			}
 			img {
-				width: -webkit-fill-available;
 				max-width: 15rem;
 				height: auto;
 				max-height: 15rem;
