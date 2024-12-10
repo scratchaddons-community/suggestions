@@ -1,20 +1,69 @@
 <script lang="ts">
-	import type { PageData } from "./$types";
+	import { dev } from "$app/environment";
+	import Load from "$lib/icons/Load.svelte";
+	import { fade } from "svelte/transition";
+	import Suggestion from "./Suggestion.svelte";
 
-	let { data }: { data: PageData } = $props();
-	const { suggestions: dbCall } = data;
+	const { data } = $props();
+	const { suggestions: suggestionsCall, images: imagesCall } = data;
 </script>
 
-<div class="suggestions">
-	{#await dbCall}
-		<div class="loading">Loading...</div>
+<div class="suggestions-container">
+	{#await suggestionsCall}
+		<div class="loading" in:fade|global={{ duration: 200 }} out:fade|global={{ duration: 200 }}>
+			<Load />
+		</div>
 	{:then suggestions}
-		{#each suggestions as suggestion}
-			<div class="suggestion">
-				<pre>
-					{JSON.stringify(suggestion, null, 2)}
-				</pre>
+		{#if suggestions}
+			<div class="suggestions">
+				{#each suggestions as suggestion, index}
+					<Suggestion {suggestion} {index} length={suggestions.length} {imagesCall} />
+				{/each}
 			</div>
-		{/each}
+		{:else}
+			<h2>No suggestions found</h2>
+		{/if}
+	{:catch error}
+		<h2>An error occurred: {error}</h2>
 	{/await}
 </div>
+
+<style>
+	.suggestions-container {
+		margin-block-start: 2rem;
+
+		.loading {
+			display: flex;
+			justify-content: center;
+			height: 0px;
+
+			/* Note: :global {svg {}} does not work in this case, it must be :global(svg) {} */
+			:global(svg) {
+				height: 3rem;
+				width: 3rem;
+				animation: spinner 1s linear infinite;
+
+				:global(path) {
+					fill: var(--brand);
+				}
+			}
+		}
+
+		.suggestions {
+			display: flex;
+			justify-content: center;
+			flex-wrap: wrap;
+			gap: 1rem;
+			width: 100%;
+		}
+	}
+
+	@keyframes spinner {
+		0% {
+			transform: rotate(360deg);
+		}
+		100% {
+			transform: rotate(0deg);
+		}
+	}
+</style>

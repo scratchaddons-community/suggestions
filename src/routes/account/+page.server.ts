@@ -3,7 +3,7 @@ import type { PageServerLoad } from "./$types";
 import { invalidateSession } from "$lib/server/auth";
 import * as auth from "$lib/server/auth";
 import { db } from "$lib/server/db";
-import { mockSuggestion } from "$lib/mockData";
+import { mockImage, mockSuggestion } from "$lib/mockData";
 import { table } from "$lib";
 
 export const load = (async ({ locals: { session, user } }) => {
@@ -20,7 +20,10 @@ export const actions: Actions = {
 		}
 		redirect(302, "/");
 	},
-	add: async () => {
+	suggestion: async () => {
 		await db.insert(table.suggestion).values(await mockSuggestion());
+	},
+	image: async () => {
+		await db.insert(table.image).values(await mockImage());
 	},
 };

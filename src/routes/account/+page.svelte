@@ -11,7 +11,8 @@
 
 	<form method="POST" use:enhance>
 		<button formaction="?/logout">Log out</button>
-		<button formaction="?/add">Add mock suggestion</button>
+		<button formaction="?/suggestion">Add mock suggestion</button>
+		<button formaction="?/image">Add mock image</button>
 	</form>
 </div>
 
