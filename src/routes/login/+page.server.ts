@@ -29,7 +29,7 @@ export const actions: Actions = {
 		);
 
 		const redirectTo = encodeBase64(array);
-		const authUrl = `https://auth.itinerary.eu.org/auth/?redirect=${redirectTo}&name=New SA Suggestions`;
+		const authUrl = `https://auth.itinerary.eu.org/auth/?redirect=${redirectTo}&name=SA Suggestions`;
 		redirect(302, authUrl);
 	},
 };
