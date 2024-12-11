@@ -3,7 +3,7 @@ import { sha256 } from "@oslojs/crypto/sha2";
 import { encodeBase32LowerCaseNoPadding, encodeHexLowerCase } from "@oslojs/encoding";
 import { db } from "$lib/server/db";
 import * as table from "$lib/server/db/schema";
-import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from "$env/static/private";
+import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, OAUTH_CALLBACK_URL } from "$env/static/private";
 import { GitHub } from "arctic";
 
 const DAY_IN_MS = 1000 * 60 * 60 * 24;
@@ -82,8 +82,4 @@ export async function validateSession(sessionId: string) {
 
 export type SessionValidationResult = Awaited<ReturnType<typeof validateSession>>;
 
-export const github = new GitHub(
-	GITHUB_CLIENT_ID,
-	GITHUB_CLIENT_SECRET,
-	"http://localhost:5173/auth/callback/",
-);
+export const github = new GitHub(GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, OAUTH_CALLBACK_URL);
