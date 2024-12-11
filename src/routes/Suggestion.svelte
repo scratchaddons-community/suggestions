@@ -43,6 +43,13 @@
 	class="suggestion"
 	in:fly|global={{ duration: 400, y: 100, delay: index * 100 }}
 	out:fade|global={reverseStaggeredDelay(length, index, 200, 25, 1000)}
+	onoutrostart={(e) => {
+		// @ts-ignore
+		e.target.parentElement.parentElement.style = `
+		height: 0;
+    margin: 0;
+    transform: translateY(2rem);`;
+	}}
 >
 	<div class="left">
 		<div class="title">
