@@ -53,7 +53,7 @@ export async function mockImage(provider: "placehold" | "picsum" = "picsum"): Pr
 	const url =
 		provider === "placehold"
 			? `https://placehold.co/${width}x${height}`
-			: `https://picsum.photos/seed/${Math.random()}/${width}/${height}`;
+			: `https://picsum.photos/seed/${(Math.random() * 10000).toFixed(0)}/${width}/${height}`;
 	return {
 		id: crypto.randomUUID(),
 		url,

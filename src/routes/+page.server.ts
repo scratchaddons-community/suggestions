@@ -8,9 +8,9 @@ import Bottleneck from "bottleneck";
 const limiter = new Bottleneck({
 	maxConcurrent: 1,
 	minTime: 200,
-	reservoir: 100,
-	reservoirRefreshInterval: 1000 * 60,
-	reservoirRefreshAmount: 60,
+	reservoir: 10,
+	reservoirRefreshInterval: 2,
+	reservoirRefreshAmount: 6,
 	strategy: Bottleneck.strategy.LEAK,
 });
 
