@@ -9,7 +9,7 @@
 <div class="account">
 	<h1>Hello {user?.displayName || user?.username}!</h1>
 
-	<form method="POST" use:enhance>
+	<form class="buttons" method="POST" use:enhance>
 		<button formaction="?/logout">Log out</button>
 		<button formaction="?/suggestion">Add mock suggestion</button>
 		<button formaction="?/image">Add mock image</button>
@@ -22,5 +22,10 @@
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
+
+		.buttons {
+			gap: 1rem;
+			display: flex;
+		}
 	}
 </style>
