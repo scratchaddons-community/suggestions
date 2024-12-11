@@ -3,6 +3,7 @@ import { generateState } from "arctic";
 import { github } from "$lib/server/auth";
 import { encodeBase64 } from "@oslojs/encoding";
 import type { PageServerLoad } from "./$types";
+import { OAUTH_CALLBACK_URL } from "$env/static/private";
 
 export const load = (async ({ locals: { session } }) => {
 	if (session) redirect(302, "/account");
@@ -24,7 +25,7 @@ export const actions: Actions = {
 		if (session) redirect(302, "/account");
 
 		const array = Uint8Array.from(
-			Array.from("http://localhost:5173/auth/callback/").map((letter) => letter.charCodeAt(0)),
+			Array.from(OAUTH_CALLBACK_URL).map((letter) => letter.charCodeAt(0)),
 		);
 
 		const redirectTo = encodeBase64(array);
