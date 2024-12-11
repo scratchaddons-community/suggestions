@@ -204,8 +204,8 @@
 			cursor: pointer;
 
 			&.voted {
-				background-color: #5dc1ff80;
-				border: color-mix(in srgb, #5dc1ff80 50%, transparent) 2px solid;
+				background-color: #5dc1ff40;
+				border: #5dc1ff66 2px solid;
 			}
 
 			&:hover {
@@ -215,6 +215,7 @@
 			.votes-count {
 				font-size: 1.1rem;
 				color: var(--text);
+				transition: color 200ms;
 				margin-left: 0.1rem;
 			}
 

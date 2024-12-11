@@ -63,22 +63,12 @@
 
 <style>
 	:global {
-		:root {
-			.sun {
-				display: none;
-			}
-
-			.moon {
-				display: block;
-			}
+		.sun {
+			display: var(--sun-display);
 		}
-		:root[data-theme="dark"] {
-			.sun {
-				display: block;
-			}
-			.moon {
-				display: none;
-			}
+
+		.moon {
+			display: var(--moon-display);
 		}
 	}
 
