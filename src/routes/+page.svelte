@@ -4,7 +4,7 @@
 	import Suggestion from "./Suggestion.svelte";
 
 	const { data } = $props();
-	const { suggestions: suggestionsCall, images: imagesCall } = data;
+	const { suggestions: suggestionsCall, images: imagesCall, session } = data;
 </script>
 
 <div class="suggestions-container">
@@ -16,7 +16,7 @@
 		{#if suggestions}
 			<div class="suggestions">
 				{#each suggestions as suggestion, index}
-					<Suggestion {suggestion} {index} length={suggestions.length} {imagesCall} />
+					<Suggestion {suggestion} {index} length={suggestions.length} {imagesCall} {session} />
 				{/each}
 			</div>
 		{:else}

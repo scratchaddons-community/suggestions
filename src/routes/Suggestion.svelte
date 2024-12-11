@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from "$app/forms";
 	import potat from "$lib/images/Potat.svg";
-	import type { Image, Suggestion, User } from "$lib/server/db/schema";
+	import type { Image, Session, Suggestion, User } from "$lib/server/db/schema";
 	import { fade, fly } from "svelte/transition";
 
 	type Props = {
@@ -12,9 +12,10 @@
 		imagesCall: Promise<Image[]>;
 		index: number;
 		length: number;
+		session: Session | null;
 	};
 
-	const { index, length, suggestion, imagesCall }: Props = $props();
+	const { index, length, suggestion, imagesCall, session }: Props = $props();
 
 	function reverseStaggeredDelay(
 		length: number,
@@ -32,6 +33,10 @@
 
 		return { duration, delay: (length - transitionsToSkip) * delay - index * delay };
 	}
+
+	let voting = $state(false);
+	let voteCount = $state(suggestion.suggestion.voterIds?.length ?? 0);
+	let voted = $state(suggestion.suggestion.voterIds?.includes(session?.userId ?? "") ?? false);
 </script>
 
 <div
@@ -65,12 +70,35 @@
 			<p>{suggestion.suggestion.description}</p>
 		</div>
 
-		<form method="POST" action="/vote?/vote" use:enhance>
+		<form
+			method="POST"
+			action="?/vote"
+			use:enhance={() => {
+				voting = true;
+				voteCount = voted ? voteCount - 1 : voteCount + 1;
+				voted = !voted;
+
+				return async ({ result }) => {
+					voting = false;
+					if (result.type === "success" && result.data) {
+						const { data } = result as unknown as {
+							data: { count: number; action: "add" | "remove" };
+						};
+
+						if (data.count) voteCount = data.count;
+						if (data.action === "remove") voted = false;
+						else voted = true;
+					} else if (result.status === 429) {
+						alert("Slow down!");
+					}
+				};
+			}}
+		>
 			<input type="hidden" name="suggestionId" value={suggestion.suggestion.id} />
-			<button class="votes omit-styles">
+			<button class="votes omit-styles" type="submit" disabled={voting} class:voted>
 				<img src={potat} alt="potat" />
 				{#if suggestion.suggestion.voterIds}
-					<span class="votes-count">{suggestion.suggestion.voterIds.length}</span>
+					<span class="votes-count">{voteCount}</span>
 				{/if}
 			</button>
 		</form>
@@ -90,7 +118,11 @@
 						onerror={(e) => {
 							const target = e.target as HTMLImageElement;
 							target.after(document.createTextNode("Failed to load image"));
+							target.remove();
 						}}
+						width={image.resolution?.x}
+						height={image.resolution?.y}
+						loading="lazy"
 					/>
 				</div>
 			{/if}
@@ -168,11 +200,16 @@
 			transition:
 				background-color 200ms,
 				border 200ms;
-			border: transparent 1px solid;
+			border: transparent 2px solid;
 			cursor: pointer;
 
+			&.voted {
+				background-color: #5dc1ff80;
+				border: color-mix(in srgb, #5dc1ff80 50%, transparent) 2px solid;
+			}
+
 			&:hover {
-				border: color-mix(in srgb, var(--text) 80%, transparent) 1px solid;
+				border: color-mix(in srgb, var(--text) 80%, transparent) 2px solid;
 			}
 
 			.votes-count {
@@ -202,13 +239,14 @@
 				justify-content: center;
 			}
 			img {
+				width: auto;
 				max-width: 15rem;
-				height: auto;
 				max-height: 15rem;
 				border-radius: 0.6rem;
 				opacity: 0;
 				transition: opacity 200ms;
 				box-shadow: -0.4rem 0.4rem 1rem 0 rgba(0, 0, 0, 0.4);
+				object-fit: cover;
 			}
 		}
 	}

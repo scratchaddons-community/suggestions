@@ -47,11 +47,16 @@ export async function mockSuggestion(userId: string): Promise<Suggestion> {
 	};
 }
 
-export async function mockImage(): Promise<Image> {
+export async function mockImage(provider: "placehold" | "picsum" = "picsum"): Promise<Image> {
 	const width = Math.floor(Math.random() * 500) + 300;
 	const height = Math.floor(Math.random() * 500) + 300;
+	const url =
+		provider === "placehold"
+			? `https://placehold.co/${width}x${height}`
+			: `https://picsum.photos/seed/${Math.random()}/${width}/${height}`;
 	return {
 		id: crypto.randomUUID(),
-		url: `https://placehold.co/${width}x${height}`,
+		url,
+		resolution: { x: width, y: height },
 	};
 }

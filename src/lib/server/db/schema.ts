@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, pgEnum } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, pgEnum, json } from "drizzle-orm/pg-core";
 
 export const tags = pgEnum("tags", ["website", "editor", "other"]);
 export const status = pgEnum("status", [
@@ -31,6 +31,7 @@ export const session = pgTable("session", {
 export const image = pgTable("image", {
 	id: text("id").primaryKey(),
 	url: text("url").notNull(),
+	resolution: json("resolution").$type<{ x: number; y: number }>(),
 });
 
 export const suggestion = pgTable("suggestion", {
