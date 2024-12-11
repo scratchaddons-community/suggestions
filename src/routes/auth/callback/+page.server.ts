@@ -5,6 +5,7 @@ import * as auth from "$lib/server/auth";
 import { db } from "$lib/server/db";
 import * as table from "$lib/server/db/schema";
 import { eq } from "drizzle-orm";
+import { OAUTH_CALLBACK_URL } from "$env/static/private";
 
 export const load: PageServerLoad = async ({ url, cookies }) => {
 	const searchParams = new URLSearchParams(url.search);
@@ -47,7 +48,7 @@ export const load: PageServerLoad = async ({ url, cookies }) => {
 		})
 			.then((response) => response.json())
 			.then((data) => {
-				if (data.valid === true && data.redirect === "http://localhost:5173/auth/callback/") {
+				if (data.valid === true && data.redirect === OAUTH_CALLBACK_URL) {
 					oauthId = data.username;
 					username = data.username;
 					displayName = "";
