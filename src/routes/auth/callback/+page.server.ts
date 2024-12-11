@@ -12,13 +12,13 @@ export const load: PageServerLoad = async ({ url, cookies }) => {
 	const state = searchParams.get("state");
 	const privateCode = searchParams.get("privateCode");
 
-	const oAuthProvider = privateCode ? "scratch" : "github";
+	const oauthProvider = privateCode ? "scratch" : "github";
 
 	let oauthId;
 	let username;
 	let displayName;
 
-	if (oAuthProvider === "github") {
+	if (oauthProvider === "github") {
 		if (!code || !state) {
 			redirect(307, "/auth/error");
 		}
@@ -41,14 +41,12 @@ export const load: PageServerLoad = async ({ url, cookies }) => {
 		displayName = githubUser.name;
 	}
 
-	if (oAuthProvider === "scratch") {
+	if (oauthProvider === "scratch") {
 		await fetch(`https://auth.itinerary.eu.org/api/auth/verifyToken?privateCode=${privateCode}`, {
 			method: "GET",
 		})
 			.then((response) => response.json())
 			.then((data) => {
-				console.log("🚀 ~ .then ~ data:", data);
-
 				if (data.valid === true && data.redirect === "http://localhost:5173/auth/callback/") {
 					oauthId = data.username;
 					username = data.username;
@@ -59,8 +57,6 @@ export const load: PageServerLoad = async ({ url, cookies }) => {
 			});
 	}
 
-	console.log({ oauthId, username, displayName });
-
 	let [dbUser] = await db.select().from(table.user).where(eq(table.user.oauthId, oauthId));
 
 	if (!dbUser) {
@@ -69,6 +65,7 @@ export const load: PageServerLoad = async ({ url, cookies }) => {
 			oauthId,
 			username,
 			displayName,
+			oauthProvider,
 		});
 	}
 
