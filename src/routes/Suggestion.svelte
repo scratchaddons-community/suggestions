@@ -103,7 +103,7 @@
 			}}
 		>
 			<input type="hidden" name="suggestionId" value={suggestion.suggestion.id} />
-			<button class="votes omit-styles" type="submit" disabled={voting} class:voted>
+			<button class="votes omit-styles" type="submit" disabled={voting || !session} class:voted>
 				<img src={potat} alt="potat" />
 				{#if suggestion.suggestion.voterIds}
 					<span class="votes-count">{voteCount}</span>
