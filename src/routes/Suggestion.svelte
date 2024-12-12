@@ -35,8 +35,13 @@
 	}
 
 	let voting = $state(false);
-	let voteCount = $derived(suggestion.suggestion.voterIds?.length ?? 0);
-	let voted = $derived(suggestion.suggestion.voterIds?.includes(session?.userId ?? "") ?? false);
+	let voteCount = $state(suggestion.suggestion.voterIds?.length ?? 0);
+	let voted = $state(suggestion.suggestion.voterIds?.includes(session?.userId ?? "") ?? false);
+
+	$effect(() => {
+		voteCount = suggestion.suggestion.voterIds?.length ?? 0;
+		voted = suggestion.suggestion.voterIds?.includes(session?.userId ?? "") ?? false;
+	});
 </script>
 
 <!-- 	out:fade|global={reverseStaggeredDelay(length, index, 200, 25, 1000)} -->
@@ -83,8 +88,8 @@
 			action="?/vote"
 			use:enhance={() => {
 				voting = true;
-				// voteCount = voted ? voteCount - 1 : voteCount + 1;
-				// voted = !voted;
+				voteCount = voted ? voteCount - 1 : voteCount + 1;
+				voted = !voted;
 
 				return async ({ result }) => {
 					voting = false;
@@ -93,9 +98,9 @@
 							data: { count: number; action: "add" | "remove" };
 						};
 
-						// if (data.count) voteCount = data.count;
-						// if (data.action === "remove") voted = false;
-						// else voted = true;
+						if (data.count) voteCount = data.count;
+						if (data.action === "remove") voted = false;
+						else voted = true;
 					} else if (result.status === 429) {
 						alert("Slow down!");
 					}
