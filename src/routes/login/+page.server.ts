@@ -16,8 +16,8 @@ export const actions: Actions = {
 		if (session) redirect(302, "/account");
 
 		const state = generateState();
-		const scopes = ["user"];
-		const url = await github.createAuthorizationURL(state, scopes);
+		const scopes = ["read:user"];
+		const url = github.createAuthorizationURL(state, scopes);
 
 		redirect(302, url);
 	},
