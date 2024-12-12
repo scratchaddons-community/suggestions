@@ -52,20 +52,24 @@
 			class:bottom
 		>
 			<input type="hidden" name="page" value={page} />
-			<select
-				name="sort"
-				bind:value={sort}
-				required
-				onchange={() => {
-					// Sneaky way to ensure that the form exists, the top form is always the first element in the array
-					navForm[0].requestSubmit();
-				}}
-			>
-				<option value="newest">Newest</option>
-				<option value="oldest">Oldest</option>
-				<option value="most-upvoted">Most Upvoted</option>
-				<option value="least-upvoted">Least Upvoted</option>
-			</select>
+
+			{#if !bottom}
+				<select
+					name="sort"
+					bind:value={sort}
+					required
+					onchange={() => {
+						// Sneaky way to ensure that the form exists, the top form is always the first element in the array
+						navForm[0].requestSubmit();
+					}}
+				>
+					<option value="newest">Newest</option>
+					<option value="oldest">Oldest</option>
+					<option value="most-upvoted">Most Upvoted</option>
+					<option value="least-upvoted">Least Upvoted</option>
+				</select>
+			{/if}
+
 			<div class="section-2">
 				<button type="submit" formaction="?/prev" disabled={page === 1}>Prev</button>
 				<button type="submit" formaction="?/next" disabled={page >= numOfPages}>Next</button>
