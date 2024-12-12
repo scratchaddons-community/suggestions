@@ -2,13 +2,27 @@
 	import Load from "$lib/icons/Load.svelte";
 	import { fade } from "svelte/transition";
 	import Suggestion from "./Suggestion.svelte";
+	import { enhance } from "$app/forms";
+	import type { Suggestion as SuggestionType, User } from "$lib/server/db/schema";
+
+	type returnedSuggestion = {
+		suggestion: SuggestionType;
+		user: Omit<User, "oauthProvider" | "oauthId"> | null;
+	};
 
 	const { data } = $props();
-	const { getSuggestions, getImages, count, session, message } = data;
+	const { getImages, count, session, message } = data;
+
+	let getSuggestions = $state(data.getSuggestions);
+	let numOfPages = $state(0);
 
 	(async () => {
-		console.log("🚀 ~ count:", await count);
+		const numOfSuggestions = await count;
+
+		if (numOfSuggestions) numOfPages = Math.ceil(numOfSuggestions / 10);
 	})();
+
+	let page = $state(1);
 </script>
 
 {#if message}
@@ -23,6 +37,28 @@
 			</div>
 		{:then suggestions}
 			{#if suggestions && getImages}
+				<form
+					method="POST"
+					use:enhance={() => {
+						return async ({ result }) => {
+							if (result.type === "success") {
+								const data = result.data as { suggestions: returnedSuggestion[]; page: number };
+								if (data) {
+									getSuggestions = (async () => {
+										return data.suggestions;
+									})();
+
+									page = data.page;
+								}
+							}
+						};
+					}}
+				>
+					<input type="hidden" name="page" value={page} />
+					<button type="submit" formaction="?/prev" disabled={page === 1}>Prev</button>
+					<button type="submit" formaction="?/next" disabled={page >= numOfPages}>Next</button>
+				</form>
+
 				<div class="suggestions">
 					{#each suggestions as suggestion, index}
 						<Suggestion {suggestion} {index} length={suggestions.length} {getImages} {session} />
@@ -38,6 +74,22 @@
 {/if}
 
 <style>
+	form {
+		display: flex;
+		justify-content: center;
+		gap: 1rem;
+		margin-block-end: 2rem;
+
+		button {
+			transition:
+				opacity 200ms,
+				transform 200ms;
+			&:disabled {
+				opacity: 0.5;
+				transform: scale(1);
+			}
+		}
+	}
 	.error {
 		font-size: 2rem;
 		color: red;

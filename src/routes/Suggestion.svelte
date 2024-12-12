@@ -15,7 +15,7 @@
 		session: Session | null;
 	};
 
-	const { index, length, suggestion, getImages, session }: Props = $props();
+	const { index, length, getImages, session, suggestion }: Props = $props();
 
 	function reverseStaggeredDelay(
 		length: number,
@@ -35,14 +35,14 @@
 	}
 
 	let voting = $state(false);
-	let voteCount = $state(suggestion.suggestion.voterIds?.length ?? 0);
-	let voted = $state(suggestion.suggestion.voterIds?.includes(session?.userId ?? "") ?? false);
+	let voteCount = $derived(suggestion.suggestion.voterIds?.length ?? 0);
+	let voted = $derived(suggestion.suggestion.voterIds?.includes(session?.userId ?? "") ?? false);
 </script>
 
+<!-- 	out:fade|global={reverseStaggeredDelay(length, index, 200, 25, 1000)} -->
 <div
 	class="suggestion"
 	in:fly|global={{ duration: 400, y: 100, delay: index * 100 }}
-	out:fade|global={reverseStaggeredDelay(length, index, 200, 25, 1000)}
 	onoutrostart={(e) => {
 		// Something REALLY odd happens...sometimes the next page starts rendering before the transition is finished. It happens genuinely randomly...
 		// @ts-ignore
@@ -83,8 +83,8 @@
 			action="?/vote"
 			use:enhance={() => {
 				voting = true;
-				voteCount = voted ? voteCount - 1 : voteCount + 1;
-				voted = !voted;
+				// voteCount = voted ? voteCount - 1 : voteCount + 1;
+				// voted = !voted;
 
 				return async ({ result }) => {
 					voting = false;
@@ -93,9 +93,9 @@
 							data: { count: number; action: "add" | "remove" };
 						};
 
-						if (data.count) voteCount = data.count;
-						if (data.action === "remove") voted = false;
-						else voted = true;
+						// if (data.count) voteCount = data.count;
+						// if (data.action === "remove") voted = false;
+						// else voted = true;
 					} else if (result.status === 429) {
 						alert("Slow down!");
 					}
