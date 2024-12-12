@@ -1,8 +1,8 @@
 <script>
-	import { enhance } from "$app/forms";
+	import { fade } from "svelte/transition";
 </script>
 
-<div class="login">
+<div class="login" in:fade|global={{ duration: 200, delay: 200 }}>
 	<form method="POST">
 		<div class="community">
 			<button formaction="?/scratch">Sign in with Scratch</button>

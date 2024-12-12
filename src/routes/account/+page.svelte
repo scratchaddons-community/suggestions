@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { enhance } from "$app/forms";
+	import { fade } from "svelte/transition";
 	import type { PageData } from "./$types";
 
 	let { data }: { data: PageData } = $props();
 	const { user } = data;
 </script>
 
-<div class="account">
+<div class="account" in:fade|global={{ duration: 200, delay: 200 }}>
 	<h1>Hello {user?.displayName || user?.username}!</h1>
 
 	<form class="buttons" method="POST" use:enhance>
