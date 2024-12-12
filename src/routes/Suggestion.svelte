@@ -9,13 +9,13 @@
 			suggestion: Suggestion;
 			user: Omit<User, "oauthProvider" | "oauthId"> | null;
 		};
-		imagesCall: Promise<Image[]>;
+		getImages: Promise<Image[]>;
 		index: number;
 		length: number;
 		session: Session | null;
 	};
 
-	const { index, length, suggestion, imagesCall, session }: Props = $props();
+	const { index, length, suggestion, getImages, session }: Props = $props();
 
 	function reverseStaggeredDelay(
 		length: number,
@@ -112,7 +112,7 @@
 		</form>
 	</div>
 
-	{#await imagesCall then images}
+	{#await getImages then images}
 		{#each images as image}
 			{#if suggestion.suggestion.imageIds && suggestion.suggestion.imageIds[0] === image.id}
 				<div class="images">

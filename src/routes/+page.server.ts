@@ -1,9 +1,10 @@
-import { table } from "$lib";
+import { sleep, table } from "$lib";
 import { db } from "$lib/server/db";
-import { desc, eq } from "drizzle-orm";
+import { count, desc, eq } from "drizzle-orm";
 import type { PageServerLoad } from "./$types";
 import { fail, type Actions } from "@sveltejs/kit";
 import Bottleneck from "bottleneck";
+import { dev } from "$app/environment";
 
 const limiter = new Bottleneck({
 	maxConcurrent: 1,
@@ -14,24 +15,53 @@ const limiter = new Bottleneck({
 	strategy: Bottleneck.strategy.LEAK,
 });
 
-export const load = (async () => {
-	const suggestions = db
-		.select({
-			suggestion: table.suggestion,
-			user: {
-				id: table.user.id,
-				username: table.user.username,
-				displayName: table.user.displayName,
-			},
-		})
-		.from(table.suggestion)
-		.orderBy(desc(table.suggestion.createdAt))
-		.leftJoin(table.user, eq(table.suggestion.authorId, table.user.id))
-		.limit(10);
+export const load = (async ({ url, depends }) => {
+	depends("page");
 
-	const images = db.select().from(table.image);
+	const page = +(url.searchParams.get("page") || 1);
+	console.log("🚀 ~ load ~ page:", typeof page);
+	if (typeof page !== "number" || Number.isNaN(page))
+		return { status: 400, message: "Invalid page number" };
 
-	return { suggestions, images };
+	const getSuggestions = (async () => {
+		if (dev) await sleep(1000);
+
+		return await db
+			.select({
+				suggestion: table.suggestion,
+				user: {
+					id: table.user.id,
+					username: table.user.username,
+					displayName: table.user.displayName,
+				},
+			})
+			.from(table.suggestion)
+			.orderBy(desc(table.suggestion.createdAt))
+			.leftJoin(table.user, eq(table.suggestion.authorId, table.user.id))
+			.limit(10)
+			.offset(((page || 1) - 1) * 10);
+	})();
+
+	const getImages = (async () => {
+		if (dev) await sleep(500);
+
+		return await db.select().from(table.image);
+	})();
+
+	const getCount = (async () => {
+		if (dev) await sleep(250);
+
+		return await db.select({ count: count() }).from(table.suggestion);
+	})();
+
+	return {
+		getSuggestions,
+		getImages,
+		count: getCount.then(([countObj]) => {
+			const { count } = countObj;
+			return count;
+		}),
+	};
 }) satisfies PageServerLoad;
 
 export const actions: Actions = {

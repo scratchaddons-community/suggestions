@@ -4,30 +4,48 @@
 	import Suggestion from "./Suggestion.svelte";
 
 	const { data } = $props();
-	const { suggestions: suggestionsCall, images: imagesCall, session } = data;
+	const { getSuggestions, getImages, count, session, message } = data;
+
+	(async () => {
+		console.log("🚀 ~ count:", await count);
+	})();
 </script>
 
-<div class="suggestions-container">
-	{#await suggestionsCall}
-		<div class="loading" in:fade|global={{ duration: 200 }} out:fade|global={{ duration: 200 }}>
-			<Load />
-		</div>
-	{:then suggestions}
-		{#if suggestions}
-			<div class="suggestions">
-				{#each suggestions as suggestion, index}
-					<Suggestion {suggestion} {index} length={suggestions.length} {imagesCall} {session} />
-				{/each}
+{#if message}
+	<div class="error">
+		{message}
+	</div>
+{:else}
+	<div class="suggestions-container">
+		{#await getSuggestions}
+			<div class="loading" in:fade|global={{ duration: 200 }} out:fade|global={{ duration: 200 }}>
+				<Load />
 			</div>
-		{:else}
-			<h2>No suggestions found</h2>
-		{/if}
-	{:catch error}
-		<h2>An error occurred: {error}</h2>
-	{/await}
-</div>
+		{:then suggestions}
+			{#if suggestions && getImages}
+				<div class="suggestions">
+					{#each suggestions as suggestion, index}
+						<Suggestion {suggestion} {index} length={suggestions.length} {getImages} {session} />
+					{/each}
+				</div>
+			{:else}
+				<h2>No suggestions found</h2>
+			{/if}
+		{:catch error}
+			<span class="error">An error occurred: {error.message}</span>
+		{/await}
+	</div>
+{/if}
 
 <style>
+	.error {
+		font-size: 2rem;
+		color: red;
+		text-align: center;
+		margin-top: 2rem;
+		width: 100%;
+		display: block;
+	}
 	.suggestions-container {
 		margin-block-start: 2rem;
 

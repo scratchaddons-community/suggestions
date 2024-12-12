@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { browser } from "$app/environment";
 	import { goto } from "$app/navigation";
+	import { page } from "$app/stores";
 	import { Sun, Moon } from "$lib/icons";
 	import Profile from "$lib/icons/Profile.svelte";
 
@@ -8,6 +9,7 @@
 
 	let theme: "dark" | "light" = $state()!;
 	let setTheme: Function = $state()!;
+	const suggestionsPage = $state($page.url.searchParams.get("page") || undefined);
 
 	if (browser) {
 		theme = localStorage.theme;
@@ -34,10 +36,17 @@
 
 <header>
 	<nav>
-		<a href="/" class="icon">
-			<img src="/icon.svg" alt="Scratch Addons" />
-			<span>Scratch Addons Suggestions</span>
-		</a>
+		{#if typeof suggestionsPage !== "undefined"}
+			<a href="/" class="icon" data-sveltekit-reload>
+				<img src="/icon.svg" alt="Scratch Addons" />
+				<span>Scratch Addons Suggestions</span>
+			</a>
+		{:else}
+			<a href="/" class="icon">
+				<img src="/icon.svg" alt="Scratch Addons" />
+				<span>Scratch Addons Suggestions</span>
+			</a>
+		{/if}
 
 		<div class="right">
 			<div class="user">
