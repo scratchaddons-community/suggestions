@@ -125,8 +125,9 @@
 						}}
 						onerror={(e) => {
 							const target = e.target as HTMLImageElement;
-							target.after(document.createTextNode("Failed to load image"));
-							target.remove();
+							const failed = document.createElement("span");
+							failed.textContent = "Failed to load image sowwy";
+							target.after(failed);
 						}}
 						width={image.resolution?.x}
 						height={image.resolution?.y}
@@ -242,6 +243,10 @@
 			justify-content: end;
 			min-width: 12rem;
 
+			:global(span) {
+				animation: fade-in 400ms forwards;
+			}
+
 			@media (width <= 768px) {
 				margin-left: 0;
 				margin-block-start: 1.5rem;
@@ -257,6 +262,15 @@
 				box-shadow: -0.4rem 0.4rem 1rem 0 rgba(0, 0, 0, 0.4);
 				object-fit: cover;
 			}
+		}
+	}
+
+	@keyframes fade-in {
+		0% {
+			opacity: 0;
+		}
+		100% {
+			opacity: 1;
 		}
 	}
 </style>

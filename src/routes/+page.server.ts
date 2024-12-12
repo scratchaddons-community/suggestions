@@ -7,10 +7,10 @@ import Bottleneck from "bottleneck";
 
 const limiter = new Bottleneck({
 	maxConcurrent: 1,
-	minTime: 200,
+	minTime: 20,
 	reservoir: 10,
-	reservoirRefreshInterval: 2,
-	reservoirRefreshAmount: 6,
+	reservoirRefreshInterval: 5000,
+	reservoirRefreshAmount: 8,
 	strategy: Bottleneck.strategy.LEAK,
 });
 
@@ -46,10 +46,11 @@ export const actions: Actions = {
 
 		try {
 			const reservoir = await limiter.currentReservoir();
-			console.log("🚀 ~ vote: ~ reservoir:", reservoir);
 			if (reservoir && reservoir < 2) {
 				return fail(429);
 			}
+
+			console.log(new Date(Date.now()).getSeconds());
 
 			return await limiter.schedule(async () => {
 				const [existingVote] = await db
