@@ -1,18 +1,30 @@
 import { sleep, table } from "$lib";
 import { db } from "$lib/server/db";
-import { count, desc, eq } from "drizzle-orm";
+import { asc, count, desc, eq, sql } from "drizzle-orm";
 import type { PageServerLoad } from "./$types";
 import { fail, type Actions } from "@sveltejs/kit";
 import Bottleneck from "bottleneck";
 import { dev } from "$app/environment";
+import type { SQL } from "drizzle-orm";
 
-const limiter = new Bottleneck({
+const voteLimiter = new Bottleneck({
 	maxConcurrent: 1,
-	minTime: 20,
+	minTime: 200,
 	reservoir: 10,
 	reservoirRefreshInterval: 5000,
 	reservoirRefreshAmount: 8,
 	strategy: Bottleneck.strategy.LEAK,
+});
+
+const pageLimiter = new Bottleneck({
+	maxConcurrent: 1,
+	minTime: 200,
+	reservoir: 10,
+	reservoirRefreshInterval: 10000,
+	reservoirRefreshAmount: 20,
+	strategy: Bottleneck.strategy.BLOCK,
+	highWater: 1,
+	penalty: 1000,
 });
 
 export const load = (async ({ url }) => {
@@ -72,12 +84,12 @@ export const actions: Actions = {
 		if (!suggestionId) return { status: 400 };
 
 		try {
-			const reservoir = await limiter.currentReservoir();
+			const reservoir = await voteLimiter.currentReservoir();
 			if (reservoir && reservoir < 2) {
 				return fail(429);
 			}
 
-			return await limiter.schedule(async () => {
+			return await voteLimiter.schedule(async () => {
 				const [existingVote] = await db
 					.select({ voterIds: table.suggestion.voterIds })
 					.from(table.suggestion)
@@ -113,36 +125,70 @@ export const actions: Actions = {
 
 	next: async ({ request }) => {
 		const data = await request.formData();
+		const sort = data.get("sort") as Parameters<typeof getPage>[1];
 		const page = +(data.get("page") || 0) + 1;
 
-		const suggestions = await getPage(page);
+		const suggestions = await getPage(page, sort);
 
 		return { page, suggestions };
 	},
 
 	prev: async ({ request }) => {
 		const data = await request.formData();
+		const sort = data.get("sort") as Parameters<typeof getPage>[1];
 		const page = +(data.get("page") || 0) - 1;
 
-		const suggestions = await getPage(page);
+		const suggestions = await getPage(page, sort);
 
 		return { page, suggestions };
 	},
+
+	sort: async ({ request }) => {
+		const data = await request.formData();
+		const sort = data.get("sort") as Parameters<typeof getPage>[1];
+		const page = +(data.get("page") || 0);
+
+		const suggestions = await getPage(page, sort);
+
+		return { sort, page, suggestions };
+	},
 };
 
-async function getPage(page: number) {
-	return await db
-		.select({
-			suggestion: table.suggestion,
-			user: {
-				id: table.user.id,
-				username: table.user.username,
-				displayName: table.user.displayName,
-			},
-		})
-		.from(table.suggestion)
-		.orderBy(desc(table.suggestion.createdAt))
-		.leftJoin(table.user, eq(table.suggestion.authorId, table.user.id))
-		.limit(10)
-		.offset(((page || 1) - 1) * 10);
+async function getPage(
+	page: number,
+	sort: "newest" | "oldest" | "most-upvoted" | "least-upvoted" = "newest",
+) {
+	let sortBy: SQL;
+
+	switch (sort) {
+		case "newest":
+			sortBy = desc(table.suggestion.createdAt);
+			break;
+		case "oldest":
+			sortBy = asc(table.suggestion.createdAt);
+			break;
+		case "most-upvoted":
+			sortBy = sql`array_length(${table.suggestion.voterIds}, 1) DESC`;
+			break;
+		case "least-upvoted":
+			sortBy = sql`array_length(${table.suggestion.voterIds}, 1) ASC`;
+			break;
+	}
+
+	return await pageLimiter.schedule(() => {
+		return db
+			.select({
+				suggestion: table.suggestion,
+				user: {
+					id: table.user.id,
+					username: table.user.username,
+					displayName: table.user.displayName,
+				},
+			})
+			.from(table.suggestion)
+			.orderBy(sortBy, desc(table.suggestion.createdAt))
+			.leftJoin(table.user, eq(table.suggestion.authorId, table.user.id))
+			.limit(10)
+			.offset(((page || 1) - 1) * 10);
+	});
 }

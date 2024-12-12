@@ -15,7 +15,8 @@
 		session: Session | null;
 	};
 
-	const { index, length, getImages, session, suggestion }: Props = $props();
+	const { index, length, getImages, session, suggestion: suggestionAndUser }: Props = $props();
+	const { suggestion, user } = $derived(suggestionAndUser);
 
 	function reverseStaggeredDelay(
 		length: number,
@@ -35,13 +36,26 @@
 	}
 
 	let voting = $state(false);
-	let voteCount = $state(suggestion.suggestion.voterIds?.length ?? 0);
-	let voted = $state(suggestion.suggestion.voterIds?.includes(session?.userId ?? "") ?? false);
+	// svelte-ignore state_referenced_locally - its ok because we don't care, thats what $effect is for
+	let voteCount = $state(suggestion.voterIds?.length ?? 0);
+	// svelte-ignore state_referenced_locally
+	let voted = $state(suggestion.voterIds?.includes(session?.userId ?? "") ?? false);
 
 	$effect(() => {
-		voteCount = suggestion.suggestion.voterIds?.length ?? 0;
-		voted = suggestion.suggestion.voterIds?.includes(session?.userId ?? "") ?? false;
+		voteCount = suggestion.voterIds?.length ?? 0;
+		voted = suggestion.voterIds?.includes(session?.userId ?? "") ?? false;
 	});
+
+	const classStyles = {
+		rejected: "#ff000080",
+		impossible: "#ff000080",
+		impractical: "#ff7b2680",
+		incompatible: "#ff7b2680",
+		implemented: "#00800080",
+		pending: "#37acff80",
+		good: "#6db02180",
+		"in-dev": "#ffff0080",
+	};
 </script>
 
 <div
@@ -50,37 +64,46 @@
 	out:fade|global={reverseStaggeredDelay(length, index, 200, 25, 1000)}
 	onoutrostart={(e) => {
 		// Something REALLY odd happens...sometimes the next page starts rendering before the transition is finished. It happens genuinely randomly...
+		// So I do this just in case lol
 		// @ts-ignore
 		e.target.parentElement.parentElement.style = `
 		height: 0;
     margin: 0;
     transform: translateY(2rem);`;
 	}}
+	onoutroend={(e) => {
+		// @ts-ignore
+		e.target.parentElement.parentElement.style = "";
+	}}
 >
 	<div class="left">
 		<div class="title">
-			<h2>{suggestion.suggestion.title}</h2>
+			<h2>{suggestion.title}</h2>
 		</div>
 
 		<div class="author">
-			{#if suggestion.user}
-				<span class="author-name">{suggestion.user.displayName || suggestion.user.username}</span>
+			{#if user}
+				<span class="author-name">{user.displayName || user.username}</span>
 			{:else}
 				<span class="author-name">User not found.</span>
 			{/if}
-			<span class="author-date">{new Date(suggestion.suggestion.createdAt).toLocaleString()}</span>
+			<span class="author-date">{new Date(suggestion.createdAt).toLocaleString()}</span>
 		</div>
 
-		{#if suggestion.suggestion.tags}
+		{#if suggestion.tags}
+			{@const status = suggestion.status}
 			<div class="tags">
-				{#each suggestion.suggestion.tags as tag}
-					<span class="tag">{tag}</span>
+				<span class="tag" style:background-color={classStyles[status]}>{status}</span>
+				{#each suggestion.tags as tag, index}
+					{#if index <= 3}
+						<span class="tag">{tag}</span>
+					{/if}
 				{/each}
 			</div>
 		{/if}
 
 		<div class="description">
-			<p>{suggestion.suggestion.description}</p>
+			<p>{suggestion.description}</p>
 		</div>
 
 		<form
@@ -107,10 +130,10 @@
 				};
 			}}
 		>
-			<input type="hidden" name="suggestionId" value={suggestion.suggestion.id} />
+			<input type="hidden" name="suggestionId" value={suggestion.id} />
 			<button class="votes omit-styles" type="submit" disabled={voting || !session} class:voted>
 				<img src={potat} alt="potat" />
-				{#if suggestion.suggestion.voterIds}
+				{#if suggestion.voterIds}
 					<span class="votes-count">{voteCount}</span>
 				{/if}
 			</button>
@@ -119,7 +142,7 @@
 
 	{#await getImages then images}
 		{#each images as image}
-			{#if suggestion.suggestion.imageIds && suggestion.suggestion.imageIds[0] === image.id}
+			{#if suggestion.imageIds && suggestion.imageIds[0] === image.id}
 				<div class="images">
 					<!-- svelte-ignore a11y_missing_attribute -->
 					<img
