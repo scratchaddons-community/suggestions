@@ -45,14 +45,10 @@ const handleCountResponse = async (countObj: { count: number }[]) => {
 	return count || 0;
 };
 
-export const load = (async ({ url }) => {
-	const page = +(url.searchParams.get("page") || 1);
-	if (typeof page !== "number" || Number.isNaN(page))
-		return { status: 400, message: "Invalid page number" };
-
-	const getSuggestions = (async () => {
+export const load = (async () => {
+	const getSuggestionsForLoad = (async () => {
 		if (dev) await sleep(1000);
-		return await getSuggestionsFromDb(page, "trending");
+		return await getSuggestionsFromDb(1, "trending");
 	})();
 
 	const getImages = (async () => {
@@ -66,7 +62,7 @@ export const load = (async ({ url }) => {
 	})();
 
 	return {
-		getSuggestions,
+		getSuggestions: getSuggestionsForLoad,
 		getImages,
 		count: await getCount.then(handleCountResponse),
 	};
@@ -116,80 +112,39 @@ export const actions: Actions = {
 		}
 	},
 
-	next: async ({ request }) => {
-		const data = await request.formData();
-		const filter = JSON.parse(data.get("filter") as string)?.value;
-		const sort = JSON.parse(data.get("sort") as string)?.value as Parameters<typeof getPage>[1];
-		const page = +(data.get("page") || 0) + 1;
+	next: async ({ request }) => getSuggestions(request, 1),
 
-		const suggestions = await getSuggestionsFromDb(page, sort, filter);
-		return { page, suggestions };
-	},
+	prev: async ({ request }) => getSuggestions(request, -1),
 
-	prev: async ({ request }) => {
-		const data = await request.formData();
-		const filter = JSON.parse(data.get("filter") as string)?.value;
-		const sort = JSON.parse(data.get("sort") as string)?.value as Parameters<typeof getPage>[1];
-		const page = +(data.get("page") || 0) - 1;
+	sort: async ({ request }) => getSuggestions(request, 0),
 
-		const suggestions = await getSuggestionsFromDb(page, sort, filter);
-		return { page, suggestions };
-	},
+	filter: async ({ request }) => getSuggestions(request, 0),
 
-	sort: async ({ request }) => {
-		const data = await request.formData();
-		const filter = JSON.parse(data.get("filter") as string)?.value;
-		const sort = JSON.parse(data.get("sort") as string)?.value as Parameters<typeof getPage>[1];
-		const page = +(data.get("page") || 0);
-
-		const suggestions = await getSuggestionsFromDb(page, sort, filter);
-		return { sort, page, suggestions };
-	},
-
-	filter: async ({ request }) => {
-		const data = await request.formData();
-		let page = +(data.get("page") || 0);
-		const filter = JSON.parse(data.get("filter") as string)?.value;
-		const sort = JSON.parse(data.get("sort") as string)?.value as Parameters<typeof getPage>[1];
-
-		const countResult = await getCountFromDb(filter);
-		const count = await handleCountResponse(countResult);
-		const numPages = Math.ceil((count || 10) / 10);
-		page = page > numPages ? 1 : page;
-
-		const suggestions = await getSuggestionsFromDb(page, sort, filter);
-		return {
-			page,
-			filter,
-			sort,
-			suggestions,
-			count,
-		};
-	},
-
-	search: async ({ request }) => {
-		const data = await request.formData();
-		let page = +(data.get("page") || 0);
-		const filter = JSON.parse(data.get("filter") as string)?.value;
-		const sort = JSON.parse(data.get("sort") as string)?.value as Parameters<typeof getPage>[1];
-		const search = data.get("search") as string;
-
-		const countResult = await getCountFromDb(filter);
-		const count = await handleCountResponse(countResult);
-		const numPages = Math.ceil((count || 10) / 10);
-		page = page > numPages ? 1 : page;
-
-		const suggestions = await getSuggestionsFromDb(page, sort, filter, search);
-		return {
-			page,
-			filter,
-			sort,
-			suggestions,
-			search,
-			count,
-		};
-	},
+	search: async ({ request }) => getSuggestions(request, 0),
 };
+
+async function getSuggestions(request: Request, pageOffset: number) {
+	const data = await request.formData();
+	let page = +(data.get("page") || 0) + pageOffset;
+	const filter = JSON.parse(data.get("filter") as string)?.value;
+	const sort = JSON.parse(data.get("sort") as string)?.value as Parameters<typeof getPage>[1];
+	const search = data.get("search") as string;
+
+	const countResult = await getCountFromDb(filter);
+	const count = await handleCountResponse(countResult);
+	const numPages = Math.ceil((count || 10) / 10);
+	page = page > numPages ? 1 : page;
+
+	const suggestions = await getSuggestionsFromDb(page, sort, filter, search);
+	return {
+		page,
+		filter,
+		sort,
+		suggestions,
+		search,
+		count,
+	};
+}
 
 async function getPage(
 	page: number,
