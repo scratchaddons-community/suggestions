@@ -35,20 +35,7 @@ export const load = (async ({ url }) => {
 	const getSuggestions = (async () => {
 		if (dev) await sleep(1000);
 
-		return await db
-			.select({
-				suggestion: table.suggestion,
-				user: {
-					id: table.user.id,
-					username: table.user.username,
-					displayName: table.user.displayName,
-				},
-			})
-			.from(table.suggestion)
-			.orderBy(desc(table.suggestion.createdAt))
-			.leftJoin(table.user, eq(table.suggestion.authorId, table.user.id))
-			.limit(10)
-			.offset(((page || 1) - 1) * 10);
+		return await getPage(page);
 	})();
 
 	const getImages = (async () => {
@@ -125,7 +112,7 @@ export const actions: Actions = {
 
 	next: async ({ request }) => {
 		const data = await request.formData();
-		const sort = data.get("sort") as Parameters<typeof getPage>[1];
+		const sort = JSON.parse(data.get("sort") as string)?.value as Parameters<typeof getPage>[1];
 		const page = +(data.get("page") || 0) + 1;
 
 		const suggestions = await getPage(page, sort);
@@ -135,7 +122,7 @@ export const actions: Actions = {
 
 	prev: async ({ request }) => {
 		const data = await request.formData();
-		const sort = data.get("sort") as Parameters<typeof getPage>[1];
+		const sort = JSON.parse(data.get("sort") as string)?.value as Parameters<typeof getPage>[1];
 		const page = +(data.get("page") || 0) - 1;
 
 		const suggestions = await getPage(page, sort);
@@ -145,7 +132,7 @@ export const actions: Actions = {
 
 	sort: async ({ request }) => {
 		const data = await request.formData();
-		const sort = data.get("sort") as Parameters<typeof getPage>[1];
+		const sort = JSON.parse(data.get("sort") as string)?.value as Parameters<typeof getPage>[1];
 		const page = +(data.get("page") || 0);
 
 		const suggestions = await getPage(page, sort);
@@ -156,21 +143,28 @@ export const actions: Actions = {
 
 async function getPage(
 	page: number,
-	sort: "newest" | "oldest" | "most-upvoted" | "least-upvoted" = "newest",
+	sort: "trending" | "newest" | "oldest" | "most" | "least" = "trending",
 ) {
 	let sortBy: SQL;
 
 	switch (sort) {
+		default:
+			sortBy = sql`
+				array_length(${table.suggestion.voterIds}, 1) /
+				POWER(((EXTRACT(EPOCH FROM NOW()) * 1000) - EXTRACT(EPOCH FROM ${table.suggestion.createdAt}) *1000) /
+				(1000 * 60 * 60 * 24) + 1, 10) DESC
+			`;
+			break;
 		case "newest":
 			sortBy = desc(table.suggestion.createdAt);
 			break;
 		case "oldest":
 			sortBy = asc(table.suggestion.createdAt);
 			break;
-		case "most-upvoted":
+		case "most":
 			sortBy = sql`array_length(${table.suggestion.voterIds}, 1) DESC`;
 			break;
-		case "least-upvoted":
+		case "least":
 			sortBy = sql`array_length(${table.suggestion.voterIds}, 1) ASC`;
 			break;
 	}

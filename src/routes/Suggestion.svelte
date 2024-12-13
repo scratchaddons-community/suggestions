@@ -64,12 +64,12 @@
 	out:fade|global={reverseStaggeredDelay(length, index, 200, 25, 1000)}
 	onoutrostart={(e) => {
 		// Something REALLY odd happens...sometimes the next page starts rendering before the transition is finished. It happens genuinely randomly...
-		// So I do this just in case lol
+		// So I do this just in case lol, currently removed because I added a transition with a delay
 		// @ts-ignore
-		e.target.parentElement.parentElement.style = `
-		height: 0;
-    margin: 0;
-    transform: translateY(2rem);`;
+		// e.target.parentElement.parentElement.style = `
+		// height: 0;
+		// margin: 0;
+		// transform: translateY(2rem);`;
 	}}
 	onoutroend={(e) => {
 		// @ts-ignore

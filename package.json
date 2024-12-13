@@ -44,6 +44,7 @@
 		"arctic": "^2.3.1",
 		"bottleneck": "^2.19.5",
 		"drizzle-orm": "^0.38.1",
-		"postgres": "^3.4.5"
+		"postgres": "^3.4.5",
+		"svelte-select": "^5.8.3"
 	}
 }

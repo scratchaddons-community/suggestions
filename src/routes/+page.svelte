@@ -4,6 +4,8 @@
 	import Suggestion from "./Suggestion.svelte";
 	import { enhance } from "$app/forms";
 	import type { Suggestion as SuggestionType, User } from "$lib/server/db/schema";
+	import Select from "svelte-select";
+	import { browser } from "$app/environment";
 
 	type returnedSuggestion = {
 		suggestion: SuggestionType;
@@ -12,6 +14,28 @@
 
 	const { data } = $props();
 	const { getImages, count, session, message } = data;
+	const sortItems = [
+		{
+			value: "trending",
+			label: "Trending",
+		},
+		{
+			value: "newest",
+			label: "Newest",
+		},
+		{
+			value: "oldest",
+			label: "Oldest",
+		},
+		{
+			value: "most",
+			label: "Most upvoted",
+		},
+		{
+			value: "least",
+			label: "Least upvoted",
+		},
+	];
 
 	let getSuggestions = $state(data.getSuggestions);
 	let numOfPages = $state(0);
@@ -23,58 +47,100 @@
 	})();
 
 	let page = $state(1);
-	let sort = $state("newest");
-	let navForm = $state([]) as HTMLFormElement[];
+	let sort = $state(sortItems[0]);
+	let navForm = $state() as HTMLFormElement;
+	$inspect(sort);
+
+	let observer = $state() as IntersectionObserver;
+
+	if (browser) {
+		observer = new IntersectionObserver(
+			([e]) => e.target.classList.toggle("is-pinned", e.intersectionRatio < 1),
+			{ threshold: [1] },
+		);
+	}
+
+	let sortForm = $state() as HTMLFormElement;
 </script>
 
-{#snippet navButtons(bottom = false)}
-	<div class="navButtons">
-		<form
-			method="POST"
-			action="?/sort"
-			bind:this={navForm[bottom ? 1 : 0]}
-			use:enhance={() => {
-				return async ({ result }) => {
-					if (result.type === "success") {
-						const data = result.data as { suggestions: returnedSuggestion[]; page: number };
-						if (data) {
-							getSuggestions = (async () => {
-								return data.suggestions;
-							})();
+{#snippet pageInput()}
+	<input type="hidden" name="page" bind:value={page} />
+{/snippet}
 
-							page = data.page;
-						}
-					}
-				};
-			}}
-			in:fly|global={{ duration: 400, y: 100 }}
-			out:fade|global={{ duration: 200 }}
-			class:bottom
-		>
-			<input type="hidden" name="page" value={page} />
+{#snippet navFilterSearch()}
+	<div class="allNav" use:observer.observe>
+		<div class="bottom">
+			<div class="sort">
+				<form
+					method="POST"
+					action="?/sort"
+					bind:this={sortForm}
+					use:enhance={() => {
+						return async ({ result }) => {
+							if (result.type === "success") {
+								const data = result.data as {
+									suggestions: returnedSuggestion[];
+									page: number;
+									sort: string;
+								};
+								console.log("🚀 ~ return ~ data:", data);
 
-			{#if !bottom}
-				<select
-					name="sort"
-					bind:value={sort}
-					required
-					onchange={() => {
-						// Sneaky way to ensure that the form exists, the top form is always the first element in the array
-						navForm[0].requestSubmit();
+								if (data) {
+									getSuggestions = (async () => {
+										return data.suggestions;
+									})();
+								}
+							}
+						};
 					}}
 				>
-					<option value="newest">Newest</option>
-					<option value="oldest">Oldest</option>
-					<option value="most-upvoted">Most Upvoted</option>
-					<option value="least-upvoted">Least Upvoted</option>
-				</select>
-			{/if}
-
-			<div class="section-2">
-				<button type="submit" formaction="?/prev" disabled={page === 1}>Prev</button>
-				<button type="submit" formaction="?/next" disabled={page >= numOfPages}>Next</button>
+					{@render pageInput()}
+					<Select
+						name="sort"
+						items={sortItems}
+						required
+						class="sort-select"
+						on:change={() => {
+							sortForm.requestSubmit();
+						}}
+						searchable
+						bind:value={sort}
+					/>
+				</form>
 			</div>
-		</form>
+
+			<div class="navButtons">
+				<form
+					method="POST"
+					bind:this={navForm}
+					use:enhance={() => {
+						return async ({ result }) => {
+							if (result.type === "success") {
+								const data = result.data as { suggestions: returnedSuggestion[]; page: number };
+								if (data) {
+									getSuggestions = (async () => {
+										return data.suggestions;
+									})();
+
+									page = data.page;
+								}
+							}
+						};
+					}}
+					in:fly|global={{ duration: 400, y: 100 }}
+					out:fade|global={{ duration: 200 }}
+				>
+					{@render pageInput()}
+					<input
+						type="hidden"
+						name="sort"
+						bind:value={() => JSON.stringify(sort), (v) => JSON.parse(v)}
+					/>
+					<button type="submit" formaction="?/prev" disabled={page === 1}>Prev</button>
+					<button type="submit" formaction="?/next" disabled={page >= numOfPages}>Next</button>
+				</form>
+			</div>
+		</div>
 	</div>
 {/snippet}
 
@@ -90,17 +156,13 @@
 			</div>
 		{:then suggestions}
 			{#if suggestions && getImages}
-				{@render navButtons()}
+				{@render navFilterSearch()}
 
 				<div class="suggestions">
 					{#each suggestions as suggestion, index}
 						<Suggestion {suggestion} {index} length={suggestions.length} {getImages} {session} />
 					{/each}
 				</div>
-
-				{#if suggestions.length >= 3}
-					{@render navButtons(true)}
-				{/if}
 			{:else}
 				<h2>No suggestions found</h2>
 			{/if}
@@ -111,46 +173,6 @@
 {/if}
 
 <style>
-	form {
-		display: flex;
-		justify-content: center;
-		gap: 1rem;
-		margin-block-end: 2rem;
-
-		&.bottom {
-			margin-block-start: 2rem;
-		}
-
-		button {
-			transition:
-				opacity var(--transition-short),
-				transform var(--transition-short);
-			&:disabled {
-				opacity: 0.5;
-				transform: scale(1);
-			}
-		}
-
-		select {
-			background-color: var(--surface2);
-			transition:
-				background-color var(--transition-short),
-				color var(--transition-short);
-			color: var(--text);
-			border: none;
-			border-radius: 0.5rem;
-			font-size: 1rem;
-			padding: 0.1rem;
-
-			&:focus-visible {
-				outline: none;
-			}
-
-			option {
-				background-color: var(--surface2);
-			}
-		}
-	}
 	.error {
 		font-size: 2rem;
 		color: red;
@@ -161,6 +183,80 @@
 	}
 	.suggestions-container {
 		margin-block-start: 2rem;
+		display: flex;
+
+		flex-direction: column;
+		align-items: center;
+		margin-block-end: 2rem;
+
+		.allNav {
+			display: flex;
+			flex-direction: column;
+			width: 80%;
+			position: sticky;
+			z-index: 2;
+			top: -1px;
+			padding: 0.5rem 1rem 0 1rem;
+			background-color: var(--background);
+			margin-block-end: 2rem;
+			transition:
+				padding var(--transition-short),
+				background-color var(--transition-short);
+
+			:global(&.is-pinned) {
+				padding: 1rem;
+			}
+
+			& > div {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				width: 100%;
+
+				.sort {
+					:global {
+						.sort-select {
+							width: 12rem;
+							transition:
+								background-color var(--transition-short),
+								border var(--transition-short);
+
+							--item-is-active-bg: var(--brand);
+							--border: color-mix(in srgb, var(--brand) 20%, transparent) 2px solid;
+							--border-hover: color-mix(in srgb, var(--brand) 40%, transparent) 2px solid;
+							--item-hover-bg: color-mix(in srgb, var(--brand) 70%, transparent);
+							--border-focused: var(--brand) 2px solid;
+							--clear-select-focus-outline: none;
+							--list-background: var(--surface1);
+							--border-radius: 0.5rem;
+							--list-border-radius: 0.5rem;
+							--list-border: var(--surface2) 2px solid;
+						}
+					}
+				}
+
+				.navButtons {
+					display: flex;
+					align-items: center;
+
+					form {
+						display: flex;
+						justify-content: center;
+						gap: 1rem;
+
+						button {
+							transition:
+								opacity var(--transition-short),
+								transform var(--transition-short);
+							&:disabled {
+								opacity: 0.5;
+								transform: scale(1);
+							}
+						}
+					}
+				}
+			}
+		}
 
 		.loading {
 			display: flex;
