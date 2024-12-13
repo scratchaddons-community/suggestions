@@ -192,7 +192,7 @@
 		.allNav {
 			display: flex;
 			flex-direction: column;
-			width: 80%;
+			width: calc(60% + 2rem);
 			position: sticky;
 			z-index: 2;
 			top: -1px;
@@ -203,6 +203,10 @@
 				padding var(--transition-short),
 				background-color var(--transition-short);
 
+			@media (width <= 768px) {
+				width: calc(100% - 2rem);
+			}
+
 			:global(&.is-pinned) {
 				padding: 1rem;
 			}
@@ -212,6 +216,11 @@
 				justify-content: space-between;
 				align-items: center;
 				width: 100%;
+
+				@media (width <= 768px) {
+					flex-direction: column;
+					gap: 1rem;
+				}
 
 				.sort {
 					:global {
