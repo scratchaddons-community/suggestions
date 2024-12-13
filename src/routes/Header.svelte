@@ -100,6 +100,10 @@
 		border-bottom-right-radius: 0.5rem;
 		width: 80%;
 
+		@media (width <= 768px) {
+			width: 90%;
+		}
+
 		.icon {
 			display: inline-flex;
 			align-items: center;

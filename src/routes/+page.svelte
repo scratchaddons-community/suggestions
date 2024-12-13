@@ -70,7 +70,7 @@
 {/snippet}
 
 {#snippet navFilterSearch()}
-	<div class="filter">
+	<div class="filter" in:fly|global={{ duration: 400, y: 100 }} out:fade|global={{ duration: 200 }}>
 		<form
 			bind:this={filterForm}
 			method="POST"
@@ -118,7 +118,12 @@
 			</div>
 		</form>
 	</div>
-	<div class="allNav" use:observer.observe>
+	<div
+		class="allNav"
+		use:observer.observe
+		in:fly|global={{ duration: 400, y: 100 }}
+		out:fade|global={{ duration: 200 }}
+	>
 		<div class="bottom">
 			<div class="sort">
 				<form
@@ -180,8 +185,6 @@
 							}
 						};
 					}}
-					in:fly|global={{ duration: 400, y: 100 }}
-					out:fade|global={{ duration: 200 }}
 				>
 					{@render pageInput()}
 					{@render sortInput()}
@@ -252,6 +255,10 @@
 				color: var(--text);
 				font-size: 1rem;
 				width: 95%;
+				transition:
+					background-color var(--transition-short),
+					border var(--transition-short),
+					color var(--transition-short);
 
 				&:hover {
 					border: color-mix(in srgb, var(--brand) 40%, transparent) 2px solid;
@@ -266,6 +273,10 @@
 
 		.filter {
 			width: calc(60% + 2rem);
+
+			@media (width <= 768px) {
+				width: calc(90% + 2rem);
+			}
 
 			form {
 				display: flex;

@@ -183,6 +183,10 @@
 		cursor: pointer;
 		box-shadow: 0 0 1rem 0.1rem rgba(0, 0, 0, 0.3);
 
+		@media (width <= 768px) {
+			width: 85%;
+		}
+
 		&:hover {
 			transform: translateY(-0.2rem);
 			z-index: 1;
