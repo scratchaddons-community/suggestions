@@ -1,6 +1,6 @@
 import { sleep, table } from "$lib";
 import { db } from "$lib/server/db";
-import { asc, count, desc, eq, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, sql } from "drizzle-orm";
 import type { PageServerLoad } from "./$types";
 import { fail, type Actions } from "@sveltejs/kit";
 import Bottleneck from "bottleneck";
@@ -53,7 +53,7 @@ export const load = (async ({ url }) => {
 	return {
 		getSuggestions,
 		getImages,
-		count: getCount.then(([countObj]) => {
+		count: await getCount.then(([countObj]) => {
 			const { count } = countObj;
 			return count || 0;
 		}),
@@ -112,40 +112,133 @@ export const actions: Actions = {
 
 	next: async ({ request }) => {
 		const data = await request.formData();
+		const filter = JSON.parse(data.get("filter") as string)?.value;
 		const sort = JSON.parse(data.get("sort") as string)?.value as Parameters<typeof getPage>[1];
 		const page = +(data.get("page") || 0) + 1;
 
-		const suggestions = await getPage(page, sort);
+		const suggestions = await getPage(page, sort, filter);
 
 		return { page, suggestions };
 	},
 
 	prev: async ({ request }) => {
 		const data = await request.formData();
+		const filter = JSON.parse(data.get("filter") as string)?.value;
 		const sort = JSON.parse(data.get("sort") as string)?.value as Parameters<typeof getPage>[1];
 		const page = +(data.get("page") || 0) - 1;
 
-		const suggestions = await getPage(page, sort);
+		const suggestions = await getPage(page, sort, filter);
 
 		return { page, suggestions };
 	},
 
 	sort: async ({ request }) => {
 		const data = await request.formData();
+		const filter = JSON.parse(data.get("filter") as string)?.value;
 		const sort = JSON.parse(data.get("sort") as string)?.value as Parameters<typeof getPage>[1];
 		const page = +(data.get("page") || 0);
 
-		const suggestions = await getPage(page, sort);
+		const suggestions = await getPage(page, sort, filter);
 
 		return { sort, page, suggestions };
+	},
+
+	filter: async ({ request }) => {
+		const data = await request.formData();
+		let page = +(data.get("page") || 0);
+		const filter = JSON.parse(data.get("filter") as string)?.value;
+		const sort = JSON.parse(data.get("sort") as string)?.value as Parameters<typeof getPage>[1];
+
+		const getCount = (async () => {
+			let filterBy: SQL | undefined = undefined;
+			if (filter && filter !== "all") filterBy = eq(table.suggestion.status, filter);
+
+			return await db.select({ count: count() }).from(table.suggestion).where(filterBy);
+		})();
+
+		const thing = await getCount.then(([countObj]) => {
+			const { count } = countObj;
+			return count || 0;
+		});
+
+		const numPages = Math.ceil((thing || 10) / 10);
+		page = page > numPages ? 1 : page;
+
+		const suggestions = await getPage(page, sort, filter);
+
+		return {
+			page,
+			filter,
+			sort,
+			suggestions,
+			count: await getCount.then(([countObj]) => {
+				const { count } = countObj;
+				return count || 0;
+			}),
+		};
+	},
+
+	search: async ({ request }) => {
+		const data = await request.formData();
+		let page = +(data.get("page") || 0);
+		const filter = JSON.parse(data.get("filter") as string)?.value;
+		const sort = JSON.parse(data.get("sort") as string)?.value as Parameters<typeof getPage>[1];
+		const search = data.get("search") as string;
+
+		const getCount = (async () => {
+			let filterBy: SQL | undefined = undefined;
+			if (filter && filter !== "all") {
+				filterBy = eq(table.suggestion.status, filter);
+
+				if (search) filterBy = and(filterBy, ilike(table.suggestion.title, search));
+			} else if (search) {
+				filterBy = ilike(table.suggestion.title, search);
+			}
+			return await db.select({ count: count() }).from(table.suggestion).where(filterBy);
+		})();
+
+		const thing = await getCount.then(([countObj]) => {
+			const { count } = countObj;
+			return count || 0;
+		});
+
+		const numPages = Math.ceil((thing || 10) / 10);
+		page = page > numPages ? 1 : page;
+
+		const suggestions = await getPage(page, sort, filter, search);
+
+		return {
+			page,
+			filter,
+			sort,
+			suggestions,
+			search,
+			count: await getCount.then(([countObj]) => {
+				const { count } = countObj;
+				return count || 0;
+			}),
+		};
 	},
 };
 
 async function getPage(
 	page: number,
 	sort: "trending" | "newest" | "oldest" | "most" | "least" = "trending",
+	filter:
+		| "pending"
+		| "good"
+		| "implemented"
+		| "in-dev"
+		| "incompatible"
+		| "impractical"
+		| "rejected"
+		| "impossible"
+		| "all"
+		| undefined = undefined,
+	search: string | undefined = undefined,
 ) {
 	let sortBy: SQL;
+	let filterBy: SQL | undefined = undefined;
 
 	switch (sort) {
 		default:
@@ -169,6 +262,14 @@ async function getPage(
 			break;
 	}
 
+	if (filter && filter !== "all") {
+		filterBy = eq(table.suggestion.status, filter);
+
+		if (search) filterBy = and(filterBy, ilike(table.suggestion.title, `%${search}%`));
+	} else if (search) {
+		filterBy = ilike(table.suggestion.title, `%${search}%`);
+	}
+
 	return await pageLimiter.schedule(() => {
 		return db
 			.select({
@@ -183,6 +284,7 @@ async function getPage(
 			.orderBy(sortBy, desc(table.suggestion.createdAt))
 			.leftJoin(table.user, eq(table.suggestion.authorId, table.user.id))
 			.limit(10)
-			.offset(((page || 1) - 1) * 10);
+			.offset(((page || 1) - 1) * 10)
+			.where(filterBy);
 	});
 }

@@ -13,43 +13,31 @@
 	};
 
 	const { data } = $props();
-	const { getImages, count, session, message } = data;
-	const sortItems = [
-		{
-			value: "trending",
-			label: "Trending",
-		},
-		{
-			value: "newest",
-			label: "Newest",
-		},
-		{
-			value: "oldest",
-			label: "Oldest",
-		},
-		{
-			value: "most",
-			label: "Most upvoted",
-		},
-		{
-			value: "least",
-			label: "Least upvoted",
-		},
-	];
+	const { getImages, session, message } = $derived(data);
+	// prettier-ignore
+	const sortItems = [{ value: "trending", label: "Trending" }, { value: "newest", label: "Newest" },
+	{ value: "oldest", label: "Oldest" }, { value: "most", label: "Most upvoted" }, { value: "least", label: "Least upvoted" }];
+
+	// prettier-ignore
+	const filterItems = [{value: "all", label: "All"}, { value: "pending", label: "Pending" }, { value: "good", label: "Good Idea" },
+	{ value: "implemented", label: "Implemented" }, { value: "in-dev", label: "In Development" }, { value: "incompatible", label: "Incompatible" },
+	{ value: "impractical", label: "Impractical" }, { value: "rejected", label: "Rejected" }, { value: "impossible", label: "Impossible" }];
 
 	let getSuggestions = $state(data.getSuggestions);
+	let count = $state(data.count);
 	let numOfPages = $state(0);
 
-	(async () => {
-		const numOfSuggestions = await count;
-
-		if (numOfSuggestions) numOfPages = Math.ceil(numOfSuggestions / 10);
-	})();
+	$effect(() => {
+		numOfPages = Math.ceil((count || 10) / 10);
+		console.log("🚀 ~ numOfPages:", numOfPages);
+	});
 
 	let page = $state(1);
 	let sort = $state(sortItems[0]);
+	let filter = $state(filterItems[0]);
 	let navForm = $state() as HTMLFormElement;
-	$inspect(sort);
+	let filterForm = $state() as HTMLFormElement;
+	let sortForm = $state() as HTMLFormElement;
 
 	let observer = $state() as IntersectionObserver;
 
@@ -59,15 +47,77 @@
 			{ threshold: [1] },
 		);
 	}
-
-	let sortForm = $state() as HTMLFormElement;
 </script>
 
 {#snippet pageInput()}
 	<input type="hidden" name="page" bind:value={page} />
 {/snippet}
 
+{#snippet sortInput()}
+	<input
+		type="hidden"
+		name="sort"
+		bind:value={() => JSON.stringify(sort), (v) => (sort = JSON.parse(v))}
+	/>
+{/snippet}
+
+{#snippet filterInput()}
+	<input
+		type="hidden"
+		name="filter"
+		bind:value={() => JSON.stringify(filter), (v) => (filter = JSON.parse(v))}
+	/>
+{/snippet}
+
 {#snippet navFilterSearch()}
+	<div class="filter">
+		<form
+			bind:this={filterForm}
+			method="POST"
+			action="?/filter"
+			use:enhance={() => {
+				return async ({ result }) => {
+					if (result.type === "success") {
+						const data = result.data as {
+							suggestions: returnedSuggestion[];
+							page: number;
+							sort: string;
+							count: number;
+						};
+						console.log("🚀 ~ return ~ data:", data);
+
+						if (data) {
+							getSuggestions = (async () => {
+								return data.suggestions;
+							})();
+
+							count = data.count;
+							page = data.page;
+						}
+					}
+				};
+			}}
+		>
+			<div class="search">
+				<input name="search" type="text" placeholder="Search for..." />
+				<button type="submit" formaction="?/search" hidden>Search</button>
+			</div>
+			<div class="select">
+				{@render pageInput()}
+				{@render sortInput()}
+				<Select
+					name="filter"
+					items={filterItems}
+					clearable={false}
+					showChevron
+					bind:value={filter}
+					on:change={() => {
+						filterForm.requestSubmit();
+					}}
+				/>
+			</div>
+		</form>
+	</div>
 	<div class="allNav" use:observer.observe>
 		<div class="bottom">
 			<div class="sort">
@@ -95,6 +145,7 @@
 					}}
 				>
 					{@render pageInput()}
+					{@render filterInput()}
 					<Select
 						name="sort"
 						items={sortItems}
@@ -105,6 +156,8 @@
 						}}
 						searchable
 						bind:value={sort}
+						clearable={false}
+						showChevron
 					/>
 				</form>
 			</div>
@@ -131,11 +184,9 @@
 					out:fade|global={{ duration: 200 }}
 				>
 					{@render pageInput()}
-					<input
-						type="hidden"
-						name="sort"
-						bind:value={() => JSON.stringify(sort), (v) => JSON.parse(v)}
-					/>
+					{@render sortInput()}
+					{@render filterInput()}
+
 					<button type="submit" formaction="?/prev" disabled={page === 1}>Prev</button>
 					<button type="submit" formaction="?/next" disabled={page >= numOfPages}>Next</button>
 				</form>
@@ -189,6 +240,43 @@
 		align-items: center;
 		margin-block-end: 2rem;
 
+		.search {
+			width: -webkit-fill-available;
+			margin-right: 1rem;
+
+			input {
+				padding: 0.65rem;
+				border-radius: 0.5rem;
+				border: color-mix(in srgb, var(--brand) 20%, transparent) 2px solid;
+				background-color: var(--background);
+				color: var(--text);
+				font-size: 1rem;
+				width: 95%;
+
+				&:hover {
+					border: color-mix(in srgb, var(--brand) 40%, transparent) 2px solid;
+				}
+
+				&:focus {
+					border: var(--brand) 2px solid;
+					outline: none;
+				}
+			}
+		}
+
+		.filter {
+			width: calc(60% + 2rem);
+
+			form {
+				display: flex;
+				justify-content: space-between;
+
+				.select {
+					width: 30%;
+				}
+			}
+		}
+
 		.allNav {
 			display: flex;
 			flex-direction: column;
@@ -224,22 +312,8 @@
 
 				.sort {
 					:global {
-						.sort-select {
+						.svelte-select {
 							width: 12rem;
-							transition:
-								background-color var(--transition-short),
-								border var(--transition-short);
-
-							--item-is-active-bg: var(--brand);
-							--border: color-mix(in srgb, var(--brand) 20%, transparent) 2px solid;
-							--border-hover: color-mix(in srgb, var(--brand) 40%, transparent) 2px solid;
-							--item-hover-bg: color-mix(in srgb, var(--brand) 70%, transparent);
-							--border-focused: var(--brand) 2px solid;
-							--clear-select-focus-outline: none;
-							--list-background: var(--surface1);
-							--border-radius: 0.5rem;
-							--list-border-radius: 0.5rem;
-							--list-border: var(--surface2) 2px solid;
 						}
 					}
 				}

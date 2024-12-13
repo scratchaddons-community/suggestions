@@ -39,3 +39,21 @@ header button:not(.omit-styles) {
 		color: var(--text);
 	}
 }
+
+.svelte-select {
+	transition:
+		background-color var(--transition-short),
+		border var(--transition-short);
+	z-index: 3;
+
+	--item-is-active-bg: var(--brand);
+	--border: color-mix(in srgb, var(--brand) 20%, transparent) 2px solid;
+	--border-hover: color-mix(in srgb, var(--brand) 40%, transparent) 2px solid;
+	--border-focused: var(--brand) 2px solid;
+	--item-hover-bg: color-mix(in srgb, var(--brand) 70%, transparent);
+	--clear-select-focus-outline: none;
+	--list-background: var(--surface1);
+	--border-radius: 0.5rem;
+	--list-border-radius: 0.5rem;
+	--list-border: var(--surface2) 2px solid;
+}
