@@ -27,6 +27,24 @@ const pageLimiter = new Bottleneck({
 	penalty: 1000,
 });
 
+const getCountFromDb = async (filter?: SQL) => {
+	return await db.select({ count: count() }).from(table.suggestion).where(filter);
+};
+
+const getSuggestionsFromDb = async (
+	page: number,
+	sort: Parameters<typeof getPage>[1],
+	filter?: Parameters<typeof getPage>[2],
+	search?: string,
+) => {
+	return await getPage(page, sort, filter, search);
+};
+
+const handleCountResponse = async (countObj: { count: number }[]) => {
+	const { count } = countObj[0];
+	return count || 0;
+};
+
 export const load = (async ({ url }) => {
 	const page = +(url.searchParams.get("page") || 1);
 	if (typeof page !== "number" || Number.isNaN(page))
@@ -34,29 +52,23 @@ export const load = (async ({ url }) => {
 
 	const getSuggestions = (async () => {
 		if (dev) await sleep(1000);
-
-		return await getPage(page);
+		return await getSuggestionsFromDb(page, "trending");
 	})();
 
 	const getImages = (async () => {
 		if (dev) await sleep(500);
-
 		return await db.select().from(table.image);
 	})();
 
 	const getCount = (async () => {
 		if (dev) await sleep(250);
-
-		return await db.select({ count: count() }).from(table.suggestion);
+		return await getCountFromDb();
 	})();
 
 	return {
 		getSuggestions,
 		getImages,
-		count: await getCount.then(([countObj]) => {
-			const { count } = countObj;
-			return count || 0;
-		}),
+		count: await getCount.then(handleCountResponse),
 	};
 }) satisfies PageServerLoad;
 
@@ -83,23 +95,17 @@ export const actions: Actions = {
 					.where(eq(table.suggestion.id, suggestionId));
 
 				if (existingVote.voterIds) {
-					if (existingVote.voterIds.includes(userId)) {
-						await db
-							.update(table.suggestion)
-							.set({ voterIds: existingVote.voterIds.filter((id) => id !== userId) })
-							.where(eq(table.suggestion.id, suggestionId));
-						const count = existingVote.voterIds.filter((id) => id !== userId).length;
+					const updatedVoterIds = existingVote.voterIds.includes(userId)
+						? existingVote.voterIds.filter((id) => id !== userId)
+						: [...existingVote.voterIds, userId];
 
-						return { count, action: "remove" };
-					} else {
-						await db
-							.update(table.suggestion)
-							.set({ voterIds: [...existingVote.voterIds, userId] })
-							.where(eq(table.suggestion.id, suggestionId));
-						const count = existingVote.voterIds.length + 1;
+					await db
+						.update(table.suggestion)
+						.set({ voterIds: updatedVoterIds })
+						.where(eq(table.suggestion.id, suggestionId));
 
-						return { count, action: "add" };
-					}
+					const count = updatedVoterIds.length;
+					return { count, action: existingVote.voterIds.includes(userId) ? "remove" : "add" };
 				}
 
 				return { status: 404 };
@@ -116,8 +122,7 @@ export const actions: Actions = {
 		const sort = JSON.parse(data.get("sort") as string)?.value as Parameters<typeof getPage>[1];
 		const page = +(data.get("page") || 0) + 1;
 
-		const suggestions = await getPage(page, sort, filter);
-
+		const suggestions = await getSuggestionsFromDb(page, sort, filter);
 		return { page, suggestions };
 	},
 
@@ -127,8 +132,7 @@ export const actions: Actions = {
 		const sort = JSON.parse(data.get("sort") as string)?.value as Parameters<typeof getPage>[1];
 		const page = +(data.get("page") || 0) - 1;
 
-		const suggestions = await getPage(page, sort, filter);
-
+		const suggestions = await getSuggestionsFromDb(page, sort, filter);
 		return { page, suggestions };
 	},
 
@@ -138,8 +142,7 @@ export const actions: Actions = {
 		const sort = JSON.parse(data.get("sort") as string)?.value as Parameters<typeof getPage>[1];
 		const page = +(data.get("page") || 0);
 
-		const suggestions = await getPage(page, sort, filter);
-
+		const suggestions = await getSuggestionsFromDb(page, sort, filter);
 		return { sort, page, suggestions };
 	},
 
@@ -149,32 +152,18 @@ export const actions: Actions = {
 		const filter = JSON.parse(data.get("filter") as string)?.value;
 		const sort = JSON.parse(data.get("sort") as string)?.value as Parameters<typeof getPage>[1];
 
-		const getCount = (async () => {
-			let filterBy: SQL | undefined = undefined;
-			if (filter && filter !== "all") filterBy = eq(table.suggestion.status, filter);
-
-			return await db.select({ count: count() }).from(table.suggestion).where(filterBy);
-		})();
-
-		const thing = await getCount.then(([countObj]) => {
-			const { count } = countObj;
-			return count || 0;
-		});
-
-		const numPages = Math.ceil((thing || 10) / 10);
+		const countResult = await getCountFromDb(filter);
+		const count = await handleCountResponse(countResult);
+		const numPages = Math.ceil((count || 10) / 10);
 		page = page > numPages ? 1 : page;
 
-		const suggestions = await getPage(page, sort, filter);
-
+		const suggestions = await getSuggestionsFromDb(page, sort, filter);
 		return {
 			page,
 			filter,
 			sort,
 			suggestions,
-			count: await getCount.then(([countObj]) => {
-				const { count } = countObj;
-				return count || 0;
-			}),
+			count,
 		};
 	},
 
@@ -185,38 +174,19 @@ export const actions: Actions = {
 		const sort = JSON.parse(data.get("sort") as string)?.value as Parameters<typeof getPage>[1];
 		const search = data.get("search") as string;
 
-		const getCount = (async () => {
-			let filterBy: SQL | undefined = undefined;
-			if (filter && filter !== "all") {
-				filterBy = eq(table.suggestion.status, filter);
-
-				if (search) filterBy = and(filterBy, ilike(table.suggestion.title, search));
-			} else if (search) {
-				filterBy = ilike(table.suggestion.title, search);
-			}
-			return await db.select({ count: count() }).from(table.suggestion).where(filterBy);
-		})();
-
-		const thing = await getCount.then(([countObj]) => {
-			const { count } = countObj;
-			return count || 0;
-		});
-
-		const numPages = Math.ceil((thing || 10) / 10);
+		const countResult = await getCountFromDb(filter);
+		const count = await handleCountResponse(countResult);
+		const numPages = Math.ceil((count || 10) / 10);
 		page = page > numPages ? 1 : page;
 
-		const suggestions = await getPage(page, sort, filter, search);
-
+		const suggestions = await getSuggestionsFromDb(page, sort, filter, search);
 		return {
 			page,
 			filter,
 			sort,
 			suggestions,
 			search,
-			count: await getCount.then(([countObj]) => {
-				const { count } = countObj;
-				return count || 0;
-			}),
+			count,
 		};
 	},
 };
@@ -264,7 +234,6 @@ async function getPage(
 
 	if (filter && filter !== "all") {
 		filterBy = eq(table.suggestion.status, filter);
-
 		if (search) filterBy = and(filterBy, ilike(table.suggestion.title, `%${search}%`));
 	} else if (search) {
 		filterBy = ilike(table.suggestion.title, `%${search}%`);
