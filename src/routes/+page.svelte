@@ -99,7 +99,14 @@
 			}}
 		>
 			<div class="search">
-				<input name="search" type="text" placeholder="Search for..." />
+				<input
+					name="search"
+					type="text"
+					placeholder="Search for..."
+					onblur={() => {
+						filterForm.requestSubmit();
+					}}
+				/>
 				<button type="submit" formaction="?/search" hidden>Search</button>
 			</div>
 			<div class="select">
@@ -284,6 +291,10 @@
 
 				.select {
 					width: 30%;
+
+					@media (width <= 768px) {
+						width: 50%;
+					}
 				}
 			}
 		}
