@@ -7,8 +7,8 @@ body {
 	scrollbar-gutter: stable both-edges;
 
 	transition:
-		background-color 200ms,
-		color 200ms;
+		background-color var(--transition-short),
+		color var(--transition-short);
 }
 
 button:not(.omit-styles) {
@@ -18,10 +18,10 @@ button:not(.omit-styles) {
 	font-size: 1rem;
 	cursor: pointer;
 	transition:
-		background-color 200ms,
-		color 200ms,
-		transform 200ms,
-		box-shadow 200ms;
+		background-color var(--transition-short),
+		color var(--transition-short),
+		transform var(--transition-short),
+		box-shadow var(--transition-short);
 
 	background-color: var(--brand);
 	color: var(--text-on-brand);

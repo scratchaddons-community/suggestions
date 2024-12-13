@@ -123,8 +123,8 @@
 
 		button {
 			transition:
-				opacity 200ms,
-				transform 200ms;
+				opacity var(--transition-short),
+				transform var(--transition-short);
 			&:disabled {
 				opacity: 0.5;
 				transform: scale(1);
@@ -133,7 +133,10 @@
 
 		select {
 			background-color: var(--surface2);
-			color: var(--text-on-brand);
+			transition:
+				background-color var(--transition-short),
+				color var(--transition-short);
+			color: var(--text);
 			border: none;
 			border-radius: 0.5rem;
 			font-size: 1rem;

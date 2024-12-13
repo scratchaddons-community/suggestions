@@ -171,9 +171,9 @@
 	.suggestion {
 		background-color: var(--surface1);
 		transition:
-			background-color 200ms,
-			transform 200ms,
-			box-shadow 200ms;
+			background-color var(--transition-short),
+			transform var(--transition-short),
+			box-shadow var(--transition-short);
 		padding: 1rem;
 		border-radius: 1rem;
 		width: 60%;
@@ -217,7 +217,7 @@
 
 			.tag {
 				background-color: var(--surface2);
-				transition: background-color 200ms;
+				transition: background-color var(--transition-short);
 				/* Something I don't like is having to set an arbitrary size to get a pill shape, using percentages does not apply consistent rounding*/
 				border-radius: 1rem;
 				padding: 0.25rem 0.35rem;
@@ -235,8 +235,8 @@
 			gap: 0.3rem;
 			background-color: var(--surface2);
 			transition:
-				background-color 200ms,
-				border 200ms;
+				background-color var(--transition-short),
+				border var(--transition-short);
 			border: transparent 2px solid;
 			cursor: pointer;
 
@@ -252,7 +252,7 @@
 			.votes-count {
 				font-size: 1.1rem;
 				color: var(--text);
-				transition: color 200ms;
+				transition: color var(--transition-short);
 				margin-left: 0.1rem;
 			}
 
@@ -272,7 +272,7 @@
 			min-width: 12rem;
 
 			:global(span) {
-				animation: fade-in 400ms forwards;
+				animation: fade-in calc(var(--transition-short) * 2) forwards;
 			}
 
 			@media (width <= 768px) {
@@ -280,13 +280,14 @@
 				margin-block-start: 1.5rem;
 				justify-content: center;
 			}
+
 			img {
 				width: auto;
 				max-width: 15rem;
 				max-height: 15rem;
 				border-radius: 0.6rem;
 				opacity: 0;
-				transition: opacity 200ms;
+				transition: opacity var(--transition-short);
 				box-shadow: -0.4rem 0.4rem 1rem 0 rgba(0, 0, 0, 0.4);
 				object-fit: cover;
 			}

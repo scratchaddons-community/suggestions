@@ -89,8 +89,8 @@
 	nav {
 		background-color: var(--header);
 		transition:
-			background-color 200ms,
-			box-shadow 200ms;
+			background-color var(--transition-short),
+			box-shadow var(--transition-short);
 		height: 3.75rem;
 		display: flex;
 		align-items: center;
@@ -131,7 +131,7 @@
 
 		.theme-toggle {
 			background-color: var(--header);
-			transition: background-color 200ms;
+			transition: background-color var(--transition-short);
 			border: none;
 			padding: 0.5rem;
 			margin-right: 0.5rem;
@@ -149,7 +149,7 @@
 						width: 1.5rem;
 						path {
 							fill: var(--header-theme-toggle-fill);
-							transition: fill 200ms;
+							transition: fill var(--transition-short);
 						}
 					}
 				}
@@ -178,7 +178,7 @@
 
 						path {
 							fill: var(--header-theme-toggle-fill);
-							transition: fill 200ms;
+							transition: fill var(--transition-short);
 						}
 					}
 				}
