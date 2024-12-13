@@ -45,10 +45,14 @@ const handleCountResponse = async (countObj: { count: number }[]) => {
 	return count || 0;
 };
 
-export const load = (async () => {
+export const load = (async ({ url }) => {
+	const page = +(url.searchParams.get("page") || 1);
+	if (typeof page !== "number" || Number.isNaN(page))
+		return { status: 400, message: "Invalid page number" };
+
 	const getSuggestionsForLoad = (async () => {
 		if (dev) await sleep(1000);
-		return await getSuggestionsFromDb(1, "trending");
+		return await getSuggestionsFromDb(page, "trending");
 	})();
 
 	const getImages = (async () => {
