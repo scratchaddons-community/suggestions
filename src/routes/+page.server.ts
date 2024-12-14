@@ -144,7 +144,6 @@ async function getSuggestions(request: Request, pageOffset: number) {
 	const sort = JSON.parse(data.get("sort") as string)?.value as Parameters<typeof getPage>[1];
 	const search = data.get("search") as string;
 
-
 	const countResult = await getCountFromDb(filter, search);
 	const count = await handleCountResponse(countResult);
 	const numPages = Math.ceil((count || 10) / 10);
