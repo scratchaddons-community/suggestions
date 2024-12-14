@@ -56,4 +56,8 @@ header button:not(.omit-styles) {
 	--border-radius: 0.5rem;
 	--list-border-radius: 0.5rem;
 	--list-border: var(--surface2) 2px solid;
+	--disabled-background: var(--background);
+	--disabled-border-color: var(--surface2);
+	--height: 44px;
+	--max-height: 44px;
 }

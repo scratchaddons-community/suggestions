@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { browser } from "$app/environment";
-	import { goto } from "$app/navigation";
+	import { goto, preloadData } from "$app/navigation";
 	import { page } from "$app/stores";
 	import { Sun, Moon } from "$lib/icons";
 	import Profile from "$lib/icons/Profile.svelte";
@@ -32,6 +32,14 @@
 	function account() {
 		if (location.pathname !== "/account") goto("/account");
 	}
+
+	function preloadAccount() {
+		preloadData("/account");
+	}
+
+	function preloadLogin() {
+		preloadData("/login");
+	}
 </script>
 
 <header>
@@ -51,11 +59,11 @@
 		<div class="right">
 			<div class="user">
 				{#if session}
-					<button class="profile button" onclick={account}>
+					<button class="profile button" onclick={account} onmouseenter={preloadAccount}>
 						<Profile />
 					</button>
 				{:else}
-					<button class="login button" onclick={login}>Login</button>
+					<button class="login button" onclick={login} onmouseenter={preloadLogin}>Login</button>
 				{/if}
 			</div>
 			<button class="theme-toggle" onclick={toggleTheme}>

@@ -6,6 +6,7 @@
 	import type { Suggestion as SuggestionType, User } from "$lib/server/db/schema";
 	import Select from "svelte-select";
 	import { browser } from "$app/environment";
+	import type { ActionResult } from "@sveltejs/kit";
 
 	type returnedSuggestion = {
 		suggestion: SuggestionType;
@@ -29,15 +30,17 @@
 
 	$effect(() => {
 		numOfPages = Math.ceil((count || 10) / 10);
-		console.log("🚀 ~ numOfPages:", numOfPages);
 	});
 
 	let page = $state(1);
 	let sort = $state(sortItems[0]);
 	let filter = $state(filterItems[0]);
+	let search = $state("");
 	let navForm = $state() as HTMLFormElement;
 	let filterForm = $state() as HTMLFormElement;
 	let sortForm = $state() as HTMLFormElement;
+	let loading = $state(false);
+	let previousFormContent = $state("");
 
 	let observer = $state() as IntersectionObserver;
 
@@ -47,6 +50,28 @@
 			{ threshold: [1] },
 		);
 	}
+
+	const useEnhanceCallback = (result: ActionResult) => {
+		if (result.type === "success") {
+			const data = result.data as {
+				suggestions: returnedSuggestion[];
+				page: number;
+				sort: string;
+				count: number;
+			};
+
+			if (data) {
+				getSuggestions = (async () => {
+					return data.suggestions;
+				})();
+
+				count = data.count;
+				page = data.page;
+			}
+		}
+
+		loading = false;
+	};
 </script>
 
 {#snippet pageInput()}
@@ -69,6 +94,10 @@
 	/>
 {/snippet}
 
+{#snippet searchInput()}
+	<input type="hidden" name="search" bind:value={search} />
+{/snippet}
+
 {#snippet navFilterSearch()}
 	<div class="filter" in:fly|global={{ duration: 400, y: 100 }} out:fade|global={{ duration: 200 }}>
 		<form
@@ -76,25 +105,9 @@
 			method="POST"
 			action="?/filter"
 			use:enhance={() => {
+				loading = true;
 				return async ({ result }) => {
-					if (result.type === "success") {
-						const data = result.data as {
-							suggestions: returnedSuggestion[];
-							page: number;
-							sort: string;
-							count: number;
-						};
-						console.log("🚀 ~ return ~ data:", data);
-
-						if (data) {
-							getSuggestions = (async () => {
-								return data.suggestions;
-							})();
-
-							count = data.count;
-							page = data.page;
-						}
-					}
+					useEnhanceCallback(result);
 				};
 			}}
 		>
@@ -104,11 +117,18 @@
 					type="text"
 					placeholder="Search for..."
 					onblur={() => {
-						filterForm.requestSubmit();
+						const currentFormContent = filterForm.querySelector("input")!.value;
+						if (currentFormContent !== previousFormContent) {
+							filterForm.requestSubmit();
+							previousFormContent = currentFormContent;
+						}
 					}}
+					disabled={loading}
+					bind:value={search}
 				/>
 				<button type="submit" formaction="?/search" hidden>Search</button>
 			</div>
+
 			<div class="select">
 				{@render pageInput()}
 				{@render sortInput()}
@@ -116,11 +136,13 @@
 					name="filter"
 					items={filterItems}
 					clearable={false}
-					showChevron
 					bind:value={filter}
 					on:change={() => {
 						filterForm.requestSubmit();
 					}}
+					showChevron={!loading}
+					disabled={loading}
+					bind:loading
 				/>
 			</div>
 		</form>
@@ -138,26 +160,15 @@
 					action="?/sort"
 					bind:this={sortForm}
 					use:enhance={() => {
+						loading = true;
 						return async ({ result }) => {
-							if (result.type === "success") {
-								const data = result.data as {
-									suggestions: returnedSuggestion[];
-									page: number;
-									sort: string;
-								};
-								console.log("🚀 ~ return ~ data:", data);
-
-								if (data) {
-									getSuggestions = (async () => {
-										return data.suggestions;
-									})();
-								}
-							}
+							useEnhanceCallback(result);
 						};
 					}}
 				>
 					{@render pageInput()}
 					{@render filterInput()}
+					{@render searchInput()}
 					<Select
 						name="sort"
 						items={sortItems}
@@ -169,7 +180,9 @@
 						searchable
 						bind:value={sort}
 						clearable={false}
-						showChevron
+						showChevron={!loading}
+						disabled={loading}
+						bind:loading
 					/>
 				</form>
 			</div>
@@ -179,23 +192,16 @@
 					method="POST"
 					bind:this={navForm}
 					use:enhance={() => {
+						loading = true;
 						return async ({ result }) => {
-							if (result.type === "success") {
-								const data = result.data as { suggestions: returnedSuggestion[]; page: number };
-								if (data) {
-									getSuggestions = (async () => {
-										return data.suggestions;
-									})();
-
-									page = data.page;
-								}
-							}
+							useEnhanceCallback(result);
 						};
 					}}
 				>
 					{@render pageInput()}
 					{@render sortInput()}
 					{@render filterInput()}
+					{@render searchInput()}
 
 					<button type="submit" formaction="?/prev" disabled={page === 1}>Prev</button>
 					<button type="submit" formaction="?/next" disabled={page >= numOfPages}>Next</button>
@@ -267,6 +273,10 @@
 					border var(--transition-short),
 					color var(--transition-short);
 
+				&:disabled {
+					border-color: var(--surface2);
+				}
+
 				&:hover {
 					border: color-mix(in srgb, var(--brand) 40%, transparent) 2px solid;
 				}
@@ -328,7 +338,6 @@
 				width: 100%;
 
 				@media (width <= 768px) {
-					flex-direction: column;
 					gap: 1rem;
 				}
 

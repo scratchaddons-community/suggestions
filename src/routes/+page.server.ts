@@ -1,6 +1,6 @@
 import { sleep, table } from "$lib";
 import { db } from "$lib/server/db";
-import { and, asc, count, desc, eq, ilike, sql, type SQL } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, or, sql, type SQL } from "drizzle-orm";
 import type { PageServerLoad } from "./$types";
 import { fail, type Actions } from "@sveltejs/kit";
 import Bottleneck from "bottleneck";
@@ -32,13 +32,13 @@ const getCountFromDb = async (
 ) => {
 	let filterBy: SQL | undefined = undefined;
 
-	if (filter && filter !== "all") {
-		filterBy = eq(table.suggestion.status, filter);
-		if (search) filterBy = and(filterBy, ilike(table.suggestion.title, `%${search}%`));
-	} else if (search) {
-		filterBy = ilike(table.suggestion.title, `%${search}%`);
-	}
-	return await db.select({ count: count() }).from(table.suggestion).where(filterBy);
+	filterBy = getFilterBy(filter, search);
+
+	return await db
+		.select({ count: count() })
+		.from(table.suggestion)
+		.leftJoin(table.user, eq(table.suggestion.authorId, table.user.id))
+		.where(filterBy);
 };
 
 const getSuggestionsFromDb = async (
@@ -140,17 +140,14 @@ export const actions: Actions = {
 async function getSuggestions(request: Request, pageOffset: number) {
 	const data = await request.formData();
 	let page = +(data.get("page") || 0) + pageOffset;
-	console.log("🚀 ~ getSuggestions ~ page:", page);
 	const filter = JSON.parse(data.get("filter") as string)?.value;
 	const sort = JSON.parse(data.get("sort") as string)?.value as Parameters<typeof getPage>[1];
 	const search = data.get("search") as string;
 
+
 	const countResult = await getCountFromDb(filter, search);
-	console.log("🚀 ~ getSuggestions ~ countResult:", countResult);
 	const count = await handleCountResponse(countResult);
-	console.log("🚀 ~ getSuggestions ~ count:", count);
 	const numPages = Math.ceil((count || 10) / 10);
-	console.log("🚀 ~ getSuggestions ~ numPages:", numPages);
 	page = page > numPages ? 1 : page;
 
 	const suggestions = await getSuggestionsFromDb(page, sort, filter, search);
@@ -205,12 +202,9 @@ async function getPage(
 			break;
 	}
 
-	if (filter && filter !== "all") {
-		filterBy = eq(table.suggestion.status, filter);
-		if (search) filterBy = and(filterBy, ilike(table.suggestion.title, `%${search}%`));
-	} else if (search) {
-		filterBy = ilike(table.suggestion.title, `%${search}%`);
-	}
+	filterBy = getFilterBy(filter, search);
+
+	if (dev) await sleep(1000);
 
 	return await pageLimiter.schedule(() => {
 		return db
@@ -229,4 +223,25 @@ async function getPage(
 			.offset(((page || 1) - 1) * 10)
 			.where(filterBy);
 	});
+}
+
+function getFilterBy(filter: Parameters<typeof getPage>[2], search: string | undefined) {
+	if (filter && filter !== "all") {
+		if (search) return and(eq(table.suggestion.status, filter), getSearchFilterBy(search));
+
+		return eq(table.suggestion.status, filter);
+	} else if (search) {
+		return getSearchFilterBy(search);
+	}
+}
+
+function getSearchFilterBy(search: string | undefined) {
+	if (search) {
+		return or(
+			ilike(table.suggestion.title, `%${search}%`),
+			ilike(table.suggestion.description, `%${search}%`),
+			ilike(table.user.username, `%${search}%`),
+			ilike(table.user.displayName, `%${search}%`),
+		);
+	}
 }
