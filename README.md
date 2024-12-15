@@ -56,10 +56,15 @@ Now, the reason I am writing this readme...
 - [ ] Add a new display mode to show more suggestions compactly
 - [ ] Find a way to improve performance? I'm sure my database queries suck
 - [ ] ...actually allow users to add suggestions
-- [ ] That includes images Jazza!!
+- [ ] That includes images Jazza!! - Probably cloudinary or imagekit
 - [x] Turn a few of my discord friends trans
 - [ ] Make suggestions be openable?
 - [ ] Add manual verification for github accounts - these are for devs only
 - [ ] Permissions such as admin roles
 - [x] Regret my life decisions
 - [ ] Infinite scrolling?
+- [ ] Add linking to other suggestions when marking as a dupe
+- [ ] Add page numbers
+- [ ] Add search params for things like pages, sorting, etc
+- [ ] Basic image editing such as cropping or adding arrows and circles
+- [ ] Add a status for what version something is being added in.
