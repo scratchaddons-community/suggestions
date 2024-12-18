@@ -4,6 +4,7 @@
 	import "../vars.css";
 	import "../app.css";
 	import Header from "./Header.svelte";
+	import Footer from "./Footer.svelte";
 	import { injectAnalytics } from "@vercel/analytics/sveltekit";
 	import { injectSpeedInsights } from "@vercel/speed-insights/sveltekit";
 	import { dev } from "$app/environment";
@@ -23,8 +24,11 @@
 	{@render children()}
 </main>
 
+<Footer />
+
 <style>
 	main {
 		padding: 0.5rem;
+		flex: 1 0 auto;
 	}
 </style>

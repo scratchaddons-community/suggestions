@@ -5,6 +5,8 @@
 
 	let { data }: { data: PageData } = $props();
 	const { user } = data;
+
+	const showMock = false;
 </script>
 
 <div class="account" in:fade|global={{ duration: 200, delay: 300 }}>
@@ -12,8 +14,10 @@
 
 	<form class="buttons" method="POST" use:enhance>
 		<button formaction="?/logout">Log out</button>
-		<button formaction="?/suggestion">Add mock suggestion</button>
-		<button formaction="?/image">Add mock image</button>
+		{#if showMock}
+			<button formaction="?/suggestion">Add mock suggestion</button>
+			<button formaction="?/image">Add mock image</button>
+		{/if}
 	</form>
 </div>
 
