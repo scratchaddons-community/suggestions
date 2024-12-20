@@ -16,15 +16,15 @@ If you would like to contribute, follow the steps below:
 - Make sure you have a suitable development environment, this includes the following:
   - [Node.js](https://nodejs.org/en)
   - [Docker](https://www.docker.com/)
-  - [NPM](https://www.npmjs.com/) or [PNPM](https://pnpm.io/)
+  - [PNPM](https://pnpm.io/)
   - [A code editor](https://code.visualstudio.com/)
   - [A GitHub OAUTH application](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app)
   - [A will to live](https://ljla.org.au/product/a-will-to-live-george-ginzburg/)
 - Fork and clone the repository
-- Run `npm i` or `pnpm i` to install the dependencies
+- Run `pnpm i` to install the dependencies
 - Populate the `.env` file with the appropriate values, see the [.env.example](./.env.example) file for details
-- Run `npm run start` or `pnpm start` to start the local database, drizzle studio, and the dev server
-- If this is your first time running the project, you will need to run `npm run db:push` or `pnpm db:push` to create the database tables, and do this again whenever you make changes to the schema. I am lazy and usually drop the entire public schema and recreate it to avoid any conflicts.
+- Run `pnpm start` to start the local database, drizzle studio, and the dev server
+- If this is your first time running the project, you will need to run `pnpm db:push` to create the database tables, and do this again whenever you make changes to the schema. I am lazy and usually drop the entire public schema and recreate it to avoid any conflicts.
   - Note: `db:push` needs to be run WHILE the database is running, so you will need to run it in a separate terminal.
 - Profit! Unless your database is haunted, you should not see any suggestions yet. As of now, once you log in there will be a "Add mock suggestion" button, which will add a randomly generated suggestion to the database. You can also add suggestions manually through drizzle studio.
 - Make your changes, and then make a pull request!!
