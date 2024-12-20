@@ -49,11 +49,20 @@
 			onchange={validateForm}
 			bind:this={formElement}
 		>
-			<input type="text" name="title" placeholder="Title" required minlength="3" maxlength="100" />
+			<div class="top">
+				<input
+					type="text"
+					name="title"
+					placeholder="Title"
+					required
+					minlength="3"
+					maxlength="100"
+				/>
+				<Select placeholder="Tag" items={selectOptions} name="tag" required searchable={false} />
+			</div>
+
 			<textarea name="description" placeholder="Description" required minlength={5} maxlength={1000}
 			></textarea>
-
-			<Select placeholder="Tag" items={selectOptions} name="tag" required searchable={false} />
 
 			<CldUploadWidget
 				uploadPreset="sa-suggestions"
@@ -109,14 +118,25 @@
 					}
 				}
 
-				input {
+				.top {
 					width: 100%;
+					display: flex;
+					gap: 1rem;
+
+					input {
+						width: -webkit-fill-available;
+					}
 				}
 
 				textarea {
 					width: 100%;
 					height: 15rem;
 					resize: none;
+					font-family: inherit;
+
+					-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+					-moz-box-sizing: border-box; /* Firefox, other Gecko */
+					box-sizing: border-box; /* Opera/IE 8+ */
 				}
 
 				:global(.svelte-select) {

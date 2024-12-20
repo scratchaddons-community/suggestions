@@ -44,7 +44,7 @@
 			background-color: var(--surface1);
 			transition: background-color var(--transition-short);
 			padding: 1rem;
-			width: 25rem;
+			width: 35rem;
 			max-width: 80%;
 			border-top-left-radius: 0.5rem;
 			border-top-right-radius: 0.5rem;
