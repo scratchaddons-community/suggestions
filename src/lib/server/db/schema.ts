@@ -1,6 +1,6 @@
 import { pgTable, text, timestamp, pgEnum, json } from "drizzle-orm/pg-core";
 
-export const tags = pgEnum("tags", ["website", "editor", "other"]);
+export const tag = pgEnum("tags", ["website", "editor", "other", "everywhere"]);
 export const status = pgEnum("status", [
 	"pending",
 	"good",
@@ -43,8 +43,10 @@ export const suggestion = pgTable("suggestion", {
 	description: text("description").notNull().default("*no description given*"),
 	voterIds: text("voter_ids")
 		.references(() => user.id)
-		.array(),
-	tags: tags("tags").notNull().array(),
+		.array()
+		.notNull()
+		.default([]),
+	tag: tag("tag").notNull(),
 	status: status("status").notNull().default("pending"),
 	imageIds: text("image_ids")
 		.references(() => image.id)

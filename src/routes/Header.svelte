@@ -3,6 +3,7 @@
 	import { goto, preloadData } from "$app/navigation";
 	import { page } from "$app/stores";
 	import { Sun, Moon } from "$lib/icons";
+	import Add from "$lib/icons/Add.svelte";
 	import Profile from "$lib/icons/Profile.svelte";
 
 	const { session } = $props();
@@ -33,12 +34,20 @@
 		if (location.pathname !== "/account") goto("/account");
 	}
 
+	function add() {
+		if (location.pathname !== "/add") goto("/add");
+	}
+
 	function preloadAccount() {
 		preloadData("/account");
 	}
 
 	function preloadLogin() {
 		preloadData("/login");
+	}
+
+	function preloadAdd() {
+		preloadData("/add");
 	}
 </script>
 
@@ -57,15 +66,23 @@
 		{/if}
 
 		<div class="right">
-			<div class="user">
-				{#if session}
+			{#if session}
+				<div class="add">
+					<button class="plus button" onclick={add} onmouseenter={preloadAdd}>
+						<Add />
+					</button>
+				</div>
+
+				<div class="user">
 					<button class="profile button" onclick={account} onmouseenter={preloadAccount}>
 						<Profile />
 					</button>
-				{:else}
+				</div>
+			{:else}
+				<div class="user">
 					<button class="login button" onclick={login} onmouseenter={preloadLogin}>Login</button>
-				{/if}
-			</div>
+				</div>
+			{/if}
 			<button class="theme-toggle" onclick={toggleTheme}>
 				<div class="sun">
 					<Sun />
@@ -142,64 +159,43 @@
 		gap: 0.5rem;
 
 		.theme-toggle {
-			background-color: var(--header);
-			transition: background-color var(--transition-short);
 			border: none;
 			padding: 0.5rem;
 			margin-right: 0.5rem;
-			border-radius: 0.3rem;
 			display: flex;
 			justify-content: center;
 			align-items: center;
 
 			div {
 				height: 1.5rem;
+			}
+		}
 
-				:global {
-					svg {
-						height: 1.5rem;
-						width: 1.5rem;
-						path {
-							fill: var(--header-theme-toggle-fill);
-							transition: fill var(--transition-short);
-						}
+		.plus,
+		.profile,
+		.theme-toggle {
+			&:not(div) {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
+
+			:global {
+				svg {
+					height: 1.5rem;
+					width: 1.5rem;
+
+					path {
+						fill: var(--header-theme-toggle-fill);
+						transition: fill var(--transition-short);
 					}
 				}
 			}
 
 			&:hover {
-				background-color: color-mix(in srgb, white, transparent 50%);
-
 				:global {
 					svg > path {
 						fill: black;
-					}
-				}
-			}
-		}
-
-		.user {
-			.profile {
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				:global {
-					svg {
-						height: 1.5rem;
-						width: 1.5rem;
-
-						path {
-							fill: var(--header-theme-toggle-fill);
-							transition: fill var(--transition-short);
-						}
-					}
-				}
-
-				&:hover {
-					:global {
-						svg > path {
-							fill: black;
-						}
 					}
 				}
 			}

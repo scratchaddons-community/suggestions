@@ -1,6 +1,12 @@
-import { table } from "$lib";
+import { table } from "$lib/server";
 import { db } from "./server/db";
 import type { Image, Suggestion } from "./server/db/schema";
+
+function randomInt(min: number, max: number) {
+	min = Math.ceil(min);
+	max = Math.floor(max);
+	return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
 export async function mockSuggestion(userId: string): Promise<Suggestion> {
 	const imageIds = (await db.select({ id: table.image.id }).from(table.image)).map(
@@ -26,9 +32,9 @@ export async function mockSuggestion(userId: string): Promise<Suggestion> {
 		description: `Description ${(Math.random() * 10000).toFixed(0)}`,
 		voterIds: getRandomNItems(voterIds as unknown as string[]),
 		imageIds: getRandomNItems(imageIds),
-		tags: (() => {
-			const tags: Suggestion["tags"] = ["website", "editor", "other"];
-			return [tags[Math.floor(Math.random() * tags.length)]];
+		tag: (() => {
+			const tag: Suggestion["tag"][] = ["website", "editor", "other", "everywhere"];
+			return tag[randomInt(0, tag.length - 1)];
 		})(),
 		status: (() => {
 			const statuses: Suggestion["status"][] = [

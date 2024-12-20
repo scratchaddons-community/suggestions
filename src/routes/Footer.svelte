@@ -42,6 +42,7 @@
 			justify-content: center;
 			align-items: center;
 			background-color: var(--surface1);
+			transition: background-color var(--transition-short);
 			padding: 1rem;
 			width: 25rem;
 			max-width: 80%;
@@ -55,11 +56,13 @@
 				font-size: 1.5rem;
 				font-weight: bold;
 				color: var(--text);
+				transition: color var(--transition-short);
 
 				:global {
 					svg {
 						height: 2rem;
 						fill: var(--text);
+						transition: fill var(--transition-short);
 					}
 				}
 			}

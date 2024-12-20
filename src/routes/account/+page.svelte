@@ -9,7 +9,8 @@
 	const showMock = false;
 </script>
 
-<div class="account" in:fade|global={{ duration: 200, delay: 300 }}>
+<!-- in:fade|global={{ duration: 200, delay: 300 }} -->
+<div class="account">
 	<h1>Hello {user?.displayName || user?.username}!</h1>
 
 	<form class="buttons" method="POST" use:enhance>

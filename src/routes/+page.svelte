@@ -249,7 +249,7 @@
 		display: block;
 	}
 	.suggestions-container {
-		margin-block-start: 2rem;
+		margin-block-start: 1rem;
 		display: flex;
 
 		flex-direction: column;
@@ -261,30 +261,7 @@
 			margin-right: 1rem;
 
 			input {
-				padding: 0.65rem;
-				border-radius: 0.5rem;
-				border: color-mix(in srgb, var(--brand) 20%, transparent) 2px solid;
-				background-color: var(--background);
-				color: var(--text);
-				font-size: 1rem;
 				width: 95%;
-				transition:
-					background-color var(--transition-short),
-					border var(--transition-short),
-					color var(--transition-short);
-
-				&:disabled {
-					border-color: var(--surface2);
-				}
-
-				&:hover {
-					border: color-mix(in srgb, var(--brand) 40%, transparent) 2px solid;
-				}
-
-				&:focus {
-					border: var(--brand) 2px solid;
-					outline: none;
-				}
 			}
 		}
 
@@ -316,7 +293,7 @@
 			position: sticky;
 			z-index: 2;
 			top: -1px;
-			padding: 0.5rem 1rem 0 1rem;
+			padding: 0.75rem 1rem 0 1rem;
 			background-color: var(--background);
 			margin-block-end: 2rem;
 			transition:
@@ -324,11 +301,12 @@
 				background-color var(--transition-short);
 
 			@media (width <= 768px) {
-				width: calc(100% - 2rem);
+				width: calc(90% + 2rem);
+				padding: 0.5rem 0;
 			}
 
 			:global(&.is-pinned) {
-				padding: 1rem;
+				padding: 1rem 0;
 			}
 
 			& > div {
@@ -362,10 +340,6 @@
 							transition:
 								opacity var(--transition-short),
 								transform var(--transition-short);
-							&:disabled {
-								opacity: 0.5;
-								transform: scale(1);
-							}
 						}
 					}
 				}

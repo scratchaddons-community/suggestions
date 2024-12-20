@@ -22,7 +22,6 @@ button:not(.omit-styles) {
 	padding: 0.5rem;
 	border-radius: 0.5rem;
 	font-size: 1rem;
-	cursor: pointer;
 	transition:
 		background-color var(--transition-short),
 		color var(--transition-short),
@@ -32,8 +31,16 @@ button:not(.omit-styles) {
 	background-color: var(--brand);
 	color: var(--text-on-brand);
 
-	&:hover {
+	&:hover:not(:disabled) {
 		transform: scale(1.1);
+	}
+
+	&:disabled {
+		opacity: 0.5;
+	}
+
+	&:not(:disabled) {
+		cursor: pointer;
 	}
 }
 
@@ -64,12 +71,43 @@ header button:not(.omit-styles) {
 	--list-border: var(--surface2) 2px solid;
 	--disabled-background: var(--background);
 	--disabled-border-color: var(--surface2);
-	--height: 44px;
-	--max-height: 44px;
+	/* Genuinely no idea why this number works */
+	--height: 3.05rem;
+	--multi-item-bg: var(--surface1);
+	--multi-item-outline: none;
+	--multi-item-clear-icon-color: var(--text);
 }
 
 code {
 	background-color: var(--surface1);
 	padding: 0.15rem 0.3rem;
 	border-radius: 0.1rem;
+}
+
+input,
+textarea {
+	padding: 0.65rem;
+	border-radius: 0.5rem;
+	border: color-mix(in srgb, var(--brand) 20%, transparent) 2px solid;
+	background-color: var(--background);
+	color: var(--text);
+	font-size: 1rem;
+	height: 1.5rem;
+	transition:
+		background-color var(--transition-short),
+		border var(--transition-short),
+		color var(--transition-short);
+
+	&:disabled {
+		border-color: var(--surface2);
+	}
+
+	&:hover {
+		border: color-mix(in srgb, var(--brand) 40%, transparent) 2px solid;
+	}
+
+	&:focus {
+		border: var(--brand) 2px solid;
+		outline: none;
+	}
 }

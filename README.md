@@ -55,7 +55,8 @@ Now, the reason I am writing this readme...
 
 - [ ] Add a new display mode to show more suggestions compactly
 - [ ] Find a way to improve performance? I'm sure my database queries suck
-- [ ] ...actually allow users to add suggestions
+- [x] ...actually allow users to add suggestions
+- [ ] Add tips on making a good suggestion
 - [ ] That includes images Jazza!! - Probably cloudinary or imagekit
 - [x] Turn a few of my discord friends trans
 - [ ] Make suggestions be openable?
@@ -68,3 +69,4 @@ Now, the reason I am writing this readme...
 - [ ] Add search params for things like pages, sorting, etc
 - [ ] Basic image editing such as cropping or adding arrows and circles
 - [ ] Add a status for what version something is being added in.
+- [ ] Compact mode, remove images and less useful info

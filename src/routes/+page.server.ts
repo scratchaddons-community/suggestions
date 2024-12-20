@@ -1,10 +1,9 @@
-import { sleep, table } from "$lib";
+import { table } from "$lib/server";
 import { db } from "$lib/server/db";
 import { and, asc, count, desc, eq, ilike, or, sql, type SQL } from "drizzle-orm";
 import type { PageServerLoad } from "./$types";
 import { fail, type Actions } from "@sveltejs/kit";
 import Bottleneck from "bottleneck";
-import { dev } from "$app/environment";
 
 const voteLimiter = new Bottleneck({
 	maxConcurrent: 1,
@@ -61,17 +60,14 @@ export const load = (async ({ url }) => {
 		return { status: 400, message: "Invalid page number" };
 
 	const getSuggestionsForLoad = (async () => {
-		if (dev) await sleep(1000);
 		return await getSuggestionsFromDb(page, "trending");
 	})();
 
 	const getImages = (async () => {
-		if (dev) await sleep(500);
 		return await db.select().from(table.image);
 	})();
 
 	const getCount = (async () => {
-		if (dev) await sleep(250);
 		return await getCountFromDb();
 	})();
 
@@ -182,7 +178,7 @@ async function getPage(
 	switch (sort) {
 		default:
 			sortBy = sql`
-				array_length(${table.suggestion.voterIds}, 1) /
+				array_length(${table.suggestion.voterIds}, 1) / 
 				POWER(((EXTRACT(EPOCH FROM NOW()) * 1000) - EXTRACT(EPOCH FROM ${table.suggestion.createdAt}) *1000) /
 				(1000 * 60 * 60 * 24) + 1, 10) DESC
 			`;
@@ -202,8 +198,6 @@ async function getPage(
 	}
 
 	filterBy = getFilterBy(filter, search);
-
-	if (dev) await sleep(1000);
 
 	return await pageLimiter.schedule(() => {
 		return db

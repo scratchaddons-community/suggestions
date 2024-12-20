@@ -4,7 +4,7 @@ import { invalidateSession } from "$lib/server/auth";
 import * as auth from "$lib/server/auth";
 import { db } from "$lib/server/db";
 import { mockImage, mockSuggestion } from "$lib/mockData";
-import { table } from "$lib";
+import { table } from "$lib/server";
 
 export const load = (async ({ locals: { session, user } }) => {
 	if (!session) redirect(302, "/login");
