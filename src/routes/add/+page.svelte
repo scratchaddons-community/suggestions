@@ -96,7 +96,7 @@
 					--border-hover: 2px transparent solid;
 					background-color: var(--surface1);
 
-					width: 10rem;
+					width: 11rem;
 					max-width: 50%;
 				}
 			}

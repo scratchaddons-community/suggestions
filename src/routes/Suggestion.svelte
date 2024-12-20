@@ -3,6 +3,7 @@
 	import potat from "$lib/images/Potat.svg";
 	import type { Image, Session, Suggestion, User } from "$lib/server/db/schema";
 	import { fade, fly } from "svelte/transition";
+	import { labels } from "$lib";
 
 	type Props = {
 		suggestion: {
@@ -90,15 +91,12 @@
 			<span class="author-date">{new Date(suggestion.createdAt).toLocaleString()}</span>
 		</div>
 
-		{#if suggestion.tags}
+		{#if suggestion.tag}
 			{@const status = suggestion.status}
-			<div class="tags">
-				<span class="tag" style:background-color={classStyles[status]}>{status}</span>
-				{#each suggestion.tags as tag, index}
-					{#if index <= 3}
-						<span class="tag">{tag}</span>
-					{/if}
-				{/each}
+			<div class="tag">
+				<span class="single-tag" style:background-color={classStyles[status]}>{labels[status]}</span
+				>
+				<span class="single-tag">{labels[suggestion.tag]}</span>
 			</div>
 		{/if}
 
@@ -212,14 +210,14 @@
 			}
 		}
 
-		.tags {
+		.tag {
 			font-size: 0.8rem;
 			display: flex;
 			gap: 0.4rem;
 			margin-block-start: 0.4rem;
 			align-items: center;
 
-			.tag {
+			.single-tag {
 				background-color: var(--surface2);
 				transition: background-color var(--transition-short);
 				/* Something I don't like is having to set an arbitrary size to get a pill shape, using percentages does not apply consistent rounding*/

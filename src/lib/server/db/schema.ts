@@ -1,6 +1,6 @@
 import { pgTable, text, timestamp, pgEnum, json } from "drizzle-orm/pg-core";
 
-export const tag = pgEnum("tags", ["website", "editor", "other", "everywhere"]);
+export const tag = pgEnum("tag", ["website", "editor", "other", "everywhere"]);
 export const status = pgEnum("status", [
 	"pending",
 	"good",
