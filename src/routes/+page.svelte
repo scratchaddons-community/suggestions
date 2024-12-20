@@ -99,7 +99,8 @@
 {/snippet}
 
 {#snippet navFilterSearch()}
-	<div class="filter" in:fly|global={{ duration: 400, y: 100 }} out:fade|global={{ duration: 200 }}>
+	<!-- out:fade|global={{ duration: 200 }} -->
+	<div class="filter" in:fly|global={{ duration: 400, y: 100 }}>
 		<form
 			bind:this={filterForm}
 			method="POST"
@@ -147,12 +148,8 @@
 			</div>
 		</form>
 	</div>
-	<div
-		class="allNav"
-		use:observer.observe
-		in:fly|global={{ duration: 400, y: 100 }}
-		out:fade|global={{ duration: 200 }}
-	>
+	<!-- out:fade|global={{ duration: 200 }} -->
+	<div class="allNav" use:observer.observe in:fly|global={{ duration: 400, y: 100 }}>
 		<div class="bottom">
 			<div class="sort">
 				<form
@@ -218,7 +215,8 @@
 {:else}
 	<div class="suggestions-container">
 		{#await getSuggestions}
-			<div class="loading" in:fade|global={{ duration: 200 }} out:fade|global={{ duration: 200 }}>
+			<!-- out:fade|global={{ duration: 200 }} -->
+			<div class="loading" in:fade|global={{ duration: 200 }}>
 				<Load />
 			</div>
 		{:then suggestions}

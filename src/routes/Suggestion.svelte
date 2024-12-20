@@ -59,10 +59,10 @@
 	};
 </script>
 
+<!-- out:fade|global={reverseStaggeredDelay(length, index, 200, 25, 1000)} -->
 <div
 	class="suggestion"
 	in:fly|global={{ duration: 400, y: 100, delay: index * 100 }}
-	out:fade|global={reverseStaggeredDelay(length, index, 200, 25, 1000)}
 	onoutrostart={(e) => {
 		// Something REALLY odd happens...sometimes the next page starts rendering before the transition is finished. It happens genuinely randomly...
 		// So I do this just in case lol, currently removed because I added a transition with a delay
@@ -70,7 +70,7 @@
 		// e.target.parentElement.parentElement.style = `
 		// height: 0;
 		// margin: 0;
-		// transform: translateY(2rem);`;
+		// transform: translateY(1rem);`;
 	}}
 	onoutroend={(e) => {
 		// @ts-ignore

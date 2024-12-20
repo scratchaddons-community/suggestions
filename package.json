@@ -14,7 +14,8 @@
 		"db:studio": "drizzle-kit studio",
 		"lint": "eslint . && prettier --check .",
 		"format": "prettier --write .",
-		"start": "concurrently \"pnpm dev\" \"pnpm db:start\" \"pnpm db:studio\" --kill-others"
+		"start": "concurrently \"pnpm dev\" \"pnpm db:start\" \"pnpm db:studio\" --kill-others",
+		"uppies": "pnpm up --latest"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^3.3.1",
