@@ -17,8 +17,7 @@
 
 	const { data } = $props();
 	const { session, message } = $derived(data);
-	const { streamed } = data;
-	const getImages = $derived(streamed?.getImages);
+	const getImages = $derived(data.getImages);
 
 	// prettier-ignore
 	const sortItems = [{ value: "trending", label: "Trending" }, { value: "newest", label: "Newest" },
@@ -27,12 +26,12 @@
 	// prettier-ignore
 	const filters = ["all", "pending", "good", "implemented", "in-dev", "incompatible", "impractical", "rejected", "impossible"] as const
 	const filterItems = filters.map((filter) => ({ value: filter, label: labels[filter] }));
-	let getSuggestions = $state(streamed?.getSuggestions);
+	let getSuggestions = $state(data.getSuggestions);
 	let count: number | undefined = $state(0);
 	let numOfPages = $state(0);
 
 	(async () => {
-		count = await streamed?.getCount;
+		count = await data.getCount;
 	})();
 
 	$effect(() => {

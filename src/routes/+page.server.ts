@@ -61,18 +61,19 @@ export const load = (async ({ url }) => {
 	if (typeof page !== "number" || Number.isNaN(page))
 		return { status: 400, message: "Invalid page number" };
 
-	const getSuggestionsForLoad = getSuggestionsFromDb(page, "trending");
+	const getSuggestionsForLoad = (async () => {
+		await sleep();
+		return await getSuggestionsFromDb(page, "trending");
+	})();
 
 	const getImages = db.select().from(table.image);
 
 	const getCount = getCountFromDb().then(handleCountResponse);
 
 	return {
-		streamed: {
-			getSuggestions: getSuggestionsForLoad,
-			getImages,
-			getCount,
-		},
+		getSuggestions: getSuggestionsForLoad,
+		getImages,
+		getCount,
 	};
 }) satisfies PageServerLoad;
 
