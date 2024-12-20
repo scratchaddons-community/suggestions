@@ -13,9 +13,7 @@ export async function mockSuggestion(userId: string): Promise<Suggestion> {
 		(image) => image.id,
 	);
 
-	const voterIds = (await db.select({ id: table.user.id }).from(table.user)).map(
-		(suggestion) => suggestion.id,
-	);
+	const voterIds = (await db.select({ id: table.user.id }).from(table.user)).map((user) => user.id);
 
 	function getRandomNItems<T>(arr: T[], n?: number): T[] {
 		if (arr.length === 0) return [];

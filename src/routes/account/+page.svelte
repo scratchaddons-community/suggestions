@@ -6,7 +6,7 @@
 	let { data }: { data: PageData } = $props();
 	const { user } = data;
 
-	const showMock = false;
+	const showMock = true;
 </script>
 
 <!-- in:fade|global={{ duration: 200, delay: 300 }} -->
