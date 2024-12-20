@@ -17,6 +17,18 @@
 		"start": "concurrently \"pnpm dev\" \"pnpm db:start\" \"pnpm db:studio\" --kill-others",
 		"uppies": "pnpm up --latest"
 	},
+	"dependencies": {
+		"@oslojs/crypto": "^1.0.1",
+		"@oslojs/encoding": "^1.1.0",
+		"@sveltejs/adapter-vercel": "^5.5.2",
+		"@vercel/analytics": "^1.4.1",
+		"@vercel/speed-insights": "^1.1.0",
+		"arctic": "^2.3.3",
+		"bottleneck": "^2.19.5",
+		"drizzle-orm": "^0.38.2",
+		"postgres": "^3.4.5",
+		"svelte-select": "^5.8.3"
+	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^3.3.1",
 		"@sveltejs/kit": "^2.13.0",
@@ -35,17 +47,5 @@
 		"typescript": "^5.7.2",
 		"typescript-eslint": "^8.18.1",
 		"vite": "^6.0.4"
-	},
-	"dependencies": {
-		"@oslojs/crypto": "^1.0.1",
-		"@oslojs/encoding": "^1.1.0",
-		"@sveltejs/adapter-vercel": "^5.5.2",
-		"@vercel/analytics": "^1.4.1",
-		"@vercel/speed-insights": "^1.1.0",
-		"arctic": "^2.3.3",
-		"bottleneck": "^2.19.5",
-		"drizzle-orm": "^0.38.2",
-		"postgres": "^3.4.5",
-		"svelte-select": "^5.8.3"
 	}
 }
