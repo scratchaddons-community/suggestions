@@ -3,6 +3,12 @@
 	import Select from "svelte-select";
 	import { labels } from "$lib";
 	import { goto } from "$app/navigation";
+	import {
+		CldUploadWidget,
+		type CloudinaryUploadWidgetInfo,
+		configureCloudinary,
+	} from "svelte-cloudinary";
+	import { PUBLIC_VITE_CLOUDINARY_CLOUD_NAME } from "$env/static/public";
 
 	const { data } = $props();
 	const { tags } = data;
@@ -14,9 +20,15 @@
 	let valid = $state(true);
 	let formElement = $state() as HTMLFormElement;
 
+	let imageDatas = $state([]) as (CloudinaryUploadWidgetInfo | string | undefined)[];
+
 	function validateForm() {
 		console.log(formElement.checkValidity());
 	}
+
+	configureCloudinary({
+		cloudName: PUBLIC_VITE_CLOUDINARY_CLOUD_NAME,
+	});
 </script>
 
 <div class="add-suggestion">
@@ -43,6 +55,22 @@
 
 			<Select placeholder="Tag" items={selectOptions} name="tag" required searchable={false} />
 
+			<CldUploadWidget
+				uploadPreset="sa-suggestions"
+				let:open
+				let:isLoading
+				options={{ cropping: true }}
+				onSuccess={(e) => {
+					// @ts-ignore
+					const info = e.info;
+					console.log("🚀 ~ info:", info);
+					imageDatas.push(info);
+				}}
+			>
+				<button type="button" onclick={() => open()} disabled={isLoading}> Open the widget </button>
+			</CldUploadWidget>
+
+			<input type="hidden" name="imageDatas" value={JSON.stringify(imageDatas)} />
 			<button type="submit" disabled={submitting || !valid}>Submit</button>
 		</form>
 	</div>

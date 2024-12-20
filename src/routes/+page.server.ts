@@ -62,13 +62,16 @@ export const load = (async ({ url }) => {
 		return { status: 400, message: "Invalid page number" };
 
 	const getSuggestionsForLoad = (async () => {
-		await sleep();
 		return await getSuggestionsFromDb(page, "trending");
 	})();
 
-	const getImages = db.select().from(table.image);
+	const getImages = (async () => {
+		return await db.select().from(table.image);
+	})();
 
-	const getCount = getCountFromDb().then(handleCountResponse);
+	const getCount = (async () => {
+		return await getCountFromDb().then(handleCountResponse);
+	})();
 
 	return {
 		getSuggestions: getSuggestionsForLoad,
