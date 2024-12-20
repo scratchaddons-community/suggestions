@@ -4,6 +4,7 @@ import { and, asc, count, desc, eq, ilike, or, sql, type SQL } from "drizzle-orm
 import type { PageServerLoad } from "./$types";
 import { fail, type Actions } from "@sveltejs/kit";
 import Bottleneck from "bottleneck";
+import { sleep } from "$lib";
 
 const voteLimiter = new Bottleneck({
 	maxConcurrent: 1,
@@ -33,6 +34,7 @@ const getCountFromDb = async (
 
 	filterBy = getFilterBy(filter, search);
 
+	sleep();
 	return await db
 		.select({ count: count() })
 		.from(table.suggestion)
@@ -59,22 +61,18 @@ export const load = (async ({ url }) => {
 	if (typeof page !== "number" || Number.isNaN(page))
 		return { status: 400, message: "Invalid page number" };
 
-	const getSuggestionsForLoad = (async () => {
-		return await getSuggestionsFromDb(page, "trending");
-	})();
+	const getSuggestionsForLoad = getSuggestionsFromDb(page, "trending");
 
-	const getImages = (async () => {
-		return await db.select().from(table.image);
-	})();
+	const getImages = db.select().from(table.image);
 
-	const getCount = (async () => {
-		return await getCountFromDb();
-	})();
+	const getCount = getCountFromDb().then(handleCountResponse);
 
 	return {
-		getSuggestions: getSuggestionsForLoad,
-		getImages,
-		count: await getCount.then(handleCountResponse),
+		streamed: {
+			getSuggestions: getSuggestionsForLoad,
+			getImages,
+			getCount,
+		},
 	};
 }) satisfies PageServerLoad;
 
@@ -95,6 +93,7 @@ export const actions: Actions = {
 			}
 
 			return await voteLimiter.schedule(async () => {
+				sleep();
 				const [existingVote] = await db
 					.select({ voterIds: table.suggestion.voterIds })
 					.from(table.suggestion)
@@ -105,6 +104,7 @@ export const actions: Actions = {
 						? existingVote.voterIds.filter((id) => id !== userId)
 						: [...existingVote.voterIds, userId];
 
+					sleep();
 					await db
 						.update(table.suggestion)
 						.set({ voterIds: updatedVoterIds })
@@ -199,7 +199,8 @@ async function getPage(
 
 	filterBy = getFilterBy(filter, search);
 
-	return await pageLimiter.schedule(() => {
+	return await pageLimiter.schedule(async () => {
+		sleep();
 		return db
 			.select({
 				suggestion: table.suggestion,

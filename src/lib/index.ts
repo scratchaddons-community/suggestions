@@ -1,4 +1,4 @@
-export function sleep(ms: number) {
+export function sleep(ms: number = 1000) {
 	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
@@ -15,6 +15,7 @@ export const labels = {
 	impractical: "Impractical",
 	rejected: "Rejected",
 	impossible: "Impossible",
+	all: "All",
 };
 
 export function toSentenceCase(input: string | null) {

@@ -7,6 +7,8 @@
 	import Select from "svelte-select";
 	import { browser } from "$app/environment";
 	import type { ActionResult } from "@sveltejs/kit";
+	import type { PageData } from "./$types.js";
+	import { labels } from "$lib";
 
 	type returnedSuggestion = {
 		suggestion: SuggestionType;
@@ -14,19 +16,24 @@
 	};
 
 	const { data } = $props();
-	const { getImages, session, message } = $derived(data);
+	const { session, message } = $derived(data);
+	const { streamed } = data;
+	const getImages = $derived(streamed?.getImages);
+
 	// prettier-ignore
 	const sortItems = [{ value: "trending", label: "Trending" }, { value: "newest", label: "Newest" },
 	{ value: "oldest", label: "Oldest" }, { value: "most", label: "Most upvoted" }, { value: "least", label: "Least upvoted" }];
 
 	// prettier-ignore
-	const filterItems = [{value: "all", label: "All"}, { value: "pending", label: "Pending" }, { value: "good", label: "Good Idea" },
-	{ value: "implemented", label: "Implemented" }, { value: "in-dev", label: "In Development" }, { value: "incompatible", label: "Incompatible" },
-	{ value: "impractical", label: "Impractical" }, { value: "rejected", label: "Rejected" }, { value: "impossible", label: "Impossible" }];
-
-	let getSuggestions = $state(data.getSuggestions);
-	let count = $state(data.count);
+	const filters = ["all", "pending", "good", "implemented", "in-dev", "incompatible", "impractical", "rejected", "impossible"] as const
+	const filterItems = filters.map((filter) => ({ value: filter, label: labels[filter] }));
+	let getSuggestions = $state(streamed?.getSuggestions);
+	let count: number | undefined = $state(0);
 	let numOfPages = $state(0);
+
+	(async () => {
+		count = await streamed?.getCount;
+	})();
 
 	$effect(() => {
 		numOfPages = Math.ceil((count || 10) / 10);
@@ -220,7 +227,7 @@
 				<Load />
 			</div>
 		{:then suggestions}
-			{#if suggestions && getImages}
+			{#if suggestions && suggestions.length && getImages}
 				{@render navFilterSearch()}
 
 				<div class="suggestions">
