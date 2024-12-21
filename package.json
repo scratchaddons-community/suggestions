@@ -30,9 +30,9 @@
 		"svelte-select": "5.8.3"
 	},
 	"devDependencies": {
-		"@eslint/js": "9.17.0",
+		"@sveltejs/adapter-auto": "3.3.1",
 		"@sveltejs/adapter-vercel": "5.5.2",
-		"@sveltejs/kit": "2.13.0",
+		"@sveltejs/kit": "2.14.0",
 		"@sveltejs/vite-plugin-svelte": "5.0.3",
 		"concurrently": "9.1.0",
 		"drizzle-kit": "0.30.1",
