@@ -9,13 +9,42 @@
 
 	const allTags = [...tags];
 	const selectOptions = allTags.map((tag) => ({ value: tag, label: labels[tag] }));
+	let images: File[] = $state([]);
+	$inspect(images);
 
 	let submitting = $state(false);
 	let valid = $state(true);
 	let formElement = $state() as HTMLFormElement;
+	let imagesContainer = $state() as HTMLDivElement;
 
-	function validateForm() {
-		console.log(formElement.checkValidity());
+	function handleAddImages() {
+		const filePicker = document.createElement("input");
+		filePicker.type = "file";
+		filePicker.multiple = true;
+		filePicker.accept = "image/*";
+		filePicker.click();
+
+		filePicker.onchange = () => {
+			const files = Array.from(filePicker.files || []);
+
+			if (files.length > 0) {
+				images = images.concat(files);
+				const fileList = files.map((file) => file.name);
+				console.log(fileList);
+				console.log(files);
+
+				files.forEach(async (file) => {
+					const reader = new FileReader();
+					reader.onloadend = async () => {
+						console.log(reader.result);
+						const image = document.createElement("img");
+						image.src = reader.result as string;
+						imagesContainer.appendChild(image);
+					};
+					reader.readAsDataURL(file);
+				});
+			}
+		};
 	}
 </script>
 
@@ -34,17 +63,21 @@
 				};
 			}}
 			action="?/suggestion"
-			onchange={validateForm}
 			bind:this={formElement}
 		>
 			<input type="text" name="title" placeholder="Title" required minlength="3" maxlength="100" />
 			<textarea name="description" placeholder="Description" required minlength={5} maxlength={1000}
 			></textarea>
 
-			<Select placeholder="Tag" items={selectOptions} name="tag" required searchable={false} />
+			<div class="bottom">
+				<Select placeholder="Tag" items={selectOptions} name="tag" required searchable={false} />
+				<button type="button" disabled={submitting} onclick={handleAddImages}>Add images</button>
+			</div>
 
 			<button type="submit" disabled={submitting || !valid}>Submit</button>
 		</form>
+
+		<div class="images" bind:this={imagesContainer}></div>
 	</div>
 </div>
 
@@ -97,7 +130,23 @@
 					background-color: var(--surface1);
 
 					width: 11rem;
-					max-width: 50%;
+					max-width: 90%;
+				}
+
+				.bottom {
+					display: flex;
+					gap: 1rem;
+				}
+			}
+
+			.images {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+				gap: 1rem;
+				margin-block: 2rem;
+				:global(img) {
+					width: 100%;
+					height: auto;
 				}
 			}
 		}
