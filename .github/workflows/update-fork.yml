@@ -11,7 +11,5 @@ jobs:
               uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
             - name: Push
               run: |
-                  git remote add target "https://$PAT@github.com/Jazza-231/suggestions.git"
+                  git remote add target https://Jazza-231:${{secrets.PAT}}@github.com/Jazza-231/suggestions.git
                   git push --force target main
-              env:
-                  PAT: ${{ secrets.PAT }}
