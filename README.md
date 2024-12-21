@@ -48,6 +48,7 @@ Why you would want to use this code is beyond me.
 ## Disclaimer
 
 This project is not affiliated with, endorsed by, or approved by Scratch Addons. Yet.
+It's position in the `scratchaddons-community` organization means nothing beyond "I know people".
 
 Now, the reason I am writing this readme...
 
