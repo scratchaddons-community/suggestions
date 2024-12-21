@@ -1,0 +1,8 @@
+name: Update Fork
+on: [push]
+jobs:
+    update:
+        name: Update Fork
+        runs-on: ubuntu-24.04
+        steps:
+            - run: curl https://pull.git.ci/process/Jazza-231/suggestions
