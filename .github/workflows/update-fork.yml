@@ -1,8 +1,17 @@
 name: Update Fork
-on: [push]
+on:
+    push:
+        branches: [main]
 jobs:
     update:
         name: Update Fork
         runs-on: ubuntu-24.04
         steps:
-            - run: curl https://pull.git.ci/process/Jazza-231/suggestions
+            - name: Checkout
+              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+            - name: Push
+              run: |
+                  git remote add target https://github.com/Jazza-231/suggestions.git
+                  git push --force target main
+              env:
+                  GITHUB_TOKEN: ${{ secrets.PAT }}
