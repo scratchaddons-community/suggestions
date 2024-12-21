@@ -1,6 +1,6 @@
 # Scratch Addons Suggestions
 
-Hello, and welcome to my horrible code. It is I, Jazza.
+Hello, and welcome to my horrible code. It is I, Jazza, featuring Paul.
 
 Let's go over some of the basics.
 
