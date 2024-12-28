@@ -36,6 +36,7 @@ If you would like to contribute, follow the steps below:
 - If you are an experienced developer, I will most likely take your word for changes you want to make.
 - That being said, unless it's necessary, lets not change the database schema lol.
 - As of 15/12/24, this project is not finished, endorsed, or even in a functional state. It is a work in progress, and no Scratch Addons org members are involved in this project (yet)
+- Icons from [https://icones.js.org/collection/material-symbols](https://icones.js.org/collection/material-symbols), standardized to a width and height of 1em, and rounded
 
 ## License
 

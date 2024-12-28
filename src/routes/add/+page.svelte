@@ -3,6 +3,7 @@
 	import Select from "svelte-select";
 	import { labels } from "$lib";
 	import { goto } from "$app/navigation";
+	import Cloudinary from "./Cloudinary.svelte";
 
 	const { data } = $props();
 	const { tags } = data;
@@ -67,15 +68,12 @@
 			<textarea name="description" placeholder="Description" required minlength={5} maxlength={1000}
 			></textarea>
 
-			<div class="bottom">
-				<Select placeholder="Tag" items={selectOptions} name="tag" required searchable={false} />
-				<button type="button" disabled={submitting} onclick={handleAddImages}>Add images</button>
-			</div>
+			<Select placeholder="Tag" items={selectOptions} name="tag" required searchable={false} />
 
 			<button type="submit" disabled={submitting || !valid}>Submit</button>
 		</form>
 
-		<div class="images" bind:this={imagesContainer}></div>
+		<Cloudinary />
 	</div>
 </div>
 
@@ -129,22 +127,6 @@
 
 					width: 11rem;
 					max-width: 90%;
-				}
-
-				.bottom {
-					display: flex;
-					gap: 1rem;
-				}
-			}
-
-			.images {
-				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
-				gap: 1rem;
-				margin-block: 2rem;
-				:global(img) {
-					width: 100%;
-					height: auto;
 				}
 			}
 		}

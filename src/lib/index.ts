@@ -38,3 +38,8 @@ export function toSentenceCase(input: string | null) {
 
 	return processedSentences.join(" ");
 }
+
+export const defaults = {
+	uploadPreset: "testing",
+	folder: "sa",
+};
