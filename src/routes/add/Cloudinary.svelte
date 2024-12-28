@@ -170,6 +170,20 @@
 					{/if}
 				</span>
 
+				<svg
+					class="progress-border"
+					viewBox="0 0 100 100"
+					xmlns="http://www.w3.org/2000/svg"
+					fill="none"
+				>
+					<rect
+						stroke-dasharray="400"
+						stroke-dashoffset={400 - (image.progressTween?.current || 0) * 4}
+						rx="3px"
+						class:hidden={image.status === "uploaded"}
+					/>
+				</svg>
+
 				<img src={image.base64} alt={image.name} />
 			</div>
 		{/if}
@@ -192,6 +206,30 @@
 			border-radius: 0.5rem;
 			height: -webkit-fill-available;
 
+			.progress-border {
+				position: absolute;
+				inset: 0;
+				z-index: 1;
+				width: 100%;
+				height: 100%;
+				border-radius: 0.5rem;
+
+				rect {
+					stroke: var(--brand);
+					stroke-width: 0.15em;
+					width: 100%;
+					height: 100%;
+					transition:
+						stroke-dashoffset 200ms ease,
+						opacity 200ms;
+					opacity: 1;
+
+					&.hidden {
+						opacity: 0;
+					}
+				}
+			}
+
 			img {
 				width: 100%;
 				height: 100%;
@@ -203,6 +241,8 @@
 				position: absolute;
 				padding: 0.25rem 0.15rem;
 				border-radius: 0.25rem;
+
+				z-index: 2;
 			}
 
 			button {
