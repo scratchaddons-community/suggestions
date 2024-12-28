@@ -1,3 +1,4 @@
 {
-	"ol-prefix": false
+	"ol-prefix": false,
+	"line-length": false
 }

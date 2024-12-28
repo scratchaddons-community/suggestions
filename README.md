@@ -22,7 +22,7 @@ If you would like to contribute, follow the steps below:
   - [A will to live](https://ljla.org.au/product/a-will-to-live-george-ginzburg/)
 - Fork and clone the repository
 - Run `pnpm i` to install the dependencies
-- Populate the `.env` file with the appropriate values, see the [.env.example](./.env.example) file for details
+- Populate the `.env` file with the appropriate values, see the [.env.example](./.env.example) file for details, and [#services](#services) for the services you will need to use
 - Run `pnpm start` to start the local database, drizzle studio, and the dev server
 - If this is your first time running the project, you will need to run `pnpm db:push` to create the database tables, and do this again whenever you make changes to the schema. I am lazy and usually drop the entire public schema and recreate it to avoid any conflicts.
   - Note: `db:push` needs to be run WHILE the database is running, so you will need to run it in a separate terminal.
@@ -72,3 +72,29 @@ Now, the reason I am writing this readme...
 - [ ] Basic image editing such as cropping or adding arrows and circles
 - [ ] Add a status for what version something is being added in.
 - [ ] Compact mode, remove images and less useful info
+
+## Services
+
+To run this project, you will need the following additional services:
+
+- [Neon](https://neon.tech/)
+- [A GitHub OAUTH application](https://github.com/settings/applications/new)
+- [Cloudinary](https://cloudinary.com/)
+
+Create a **Neon** account, and then create a new project. Choose a name and postgres version 17. You will be redirected to `https://console.neon.tech/app/projects/<project-name>/quickstart`, where you can easily copy the postgres snippet, and paste this into the .env file.
+
+For the **GitHub OAUTH application**, follow the above link and create a new application. Choose a name, set the homepage URL to `http://localhost:5173`, and the callback URL to `http://localhost:5173/auth/callback/`. Make sure the value in the .env file is set to this callback URL.
+
+Note: This is for development. Replace with whatever your domain is in production.
+
+Create a **Cloudinary** account. Choose "Coding with APIs and SDKs". Navigate to settings, and then to "Product Environments" under "Account settings". Choose the three dots next to "Active" and select "Edit". Set your cloud name to whatever you would like, and save changes.
+
+Then, go to the "API Keys" tab under "Product environment settings", and copy the following to your .env file:
+
+- Cloud name: at the top of the page next to the heading "API Keys" in blue
+- API key: In the middle of the page, you can't miss it.
+- API secret: Hover over the redacted secret and click the eye icon to the right of it. Confirm your password, and then press the copy button that appears next to the eye icon.
+
+I recommend deploying this project to [Vercel](https://vercel.com/) for production, as I have had issues with Cloudflare Pages. This may have been fixed by now, as I recently removed the Cloudinary package from the images test, which was not runtime agnostic. I'll try it now and report back lol. It totally works, I am a genius.
+
+With the expected usage of this project, this should be able to run on free tiers of all services, including Neon, GitHub, Cloudinary, and Vercel.
