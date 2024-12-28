@@ -14,7 +14,6 @@
 
 	let submitting = $state(false);
 	let valid = $state(true);
-	let formElement = $state() as HTMLFormElement;
 	let imagesContainer = $state() as HTMLDivElement;
 
 	function handleAddImages() {
@@ -63,7 +62,6 @@
 				};
 			}}
 			action="?/suggestion"
-			bind:this={formElement}
 		>
 			<input type="text" name="title" placeholder="Title" required minlength="3" maxlength="100" />
 			<textarea name="description" placeholder="Description" required minlength={5} maxlength={1000}
