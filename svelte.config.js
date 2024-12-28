@@ -1,4 +1,5 @@
-import adapter from "@sveltejs/adapter-vercel";
+// Use Auto for now until I choose between vercel and cloudflare
+import adapter from "@sveltejs/adapter-auto";
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 
 /** @type {import('@sveltejs/kit').Config} */
