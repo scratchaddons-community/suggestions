@@ -1,5 +1,8 @@
-export function sleep(ms: number = 3000) {
-	return new Promise((resolve) => setTimeout(resolve, ms));
+import { dev } from "$app/environment";
+
+export function sleep(ms: number = 2000) {
+	// Have I been sleeping in PRODUCTION?!?!??!?!
+	return new Promise((resolve) => setTimeout(resolve, dev ? ms : 0));
 }
 
 export const labels = {
