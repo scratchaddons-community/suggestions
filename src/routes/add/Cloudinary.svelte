@@ -167,6 +167,10 @@
 						>
 							<Delete />
 						</button>
+					{:else if image.status === "uploading"}
+						<span class="progress">
+							{image.progressTween?.current?.toFixed()}%
+						</span>
 					{/if}
 				</span>
 
@@ -178,9 +182,11 @@
 				>
 					<rect
 						stroke-dasharray="400"
-						stroke-dashoffset={400 - (image.progressTween?.current || 0) * 4}
-						rx="3px"
-						class:hidden={image.status === "uploaded"}
+						stroke-dashoffset={image.status === "uploaded"
+							? 0
+							: 400 - (image.progressTween?.current || 0) * 0.92}
+						class:done={image.status === "uploaded"}
+						rx="4px"
 					/>
 				</svg>
 
@@ -193,10 +199,15 @@
 <style>
 	.images {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+		grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
 		gap: 1rem;
 		margin-block: 2rem;
 		width: 50%;
+
+		@media (width <= 768px) {
+			grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+			width: 90%;
+		}
 
 		.img-container {
 			position: relative;
@@ -205,6 +216,18 @@
 			background-color: var(--surface1);
 			border-radius: 0.5rem;
 			height: -webkit-fill-available;
+			max-width: 24rem;
+			padding: 0.35rem;
+
+			.progress {
+				position: absolute;
+				z-index: 2;
+				font-size: 1.2rem;
+				color: var(--text);
+				background-color: color-mix(in srgb, var(--surface1) 50%, transparent);
+				text-align: center;
+				padding: 0.2rem 0.3rem;
+			}
 
 			.progress-border {
 				position: absolute;
@@ -216,16 +239,19 @@
 
 				rect {
 					stroke: var(--brand);
-					stroke-width: 0.15em;
+					stroke-width: 0.25rem;
 					width: 100%;
 					height: 100%;
 					transition:
-						stroke-dashoffset 200ms ease,
-						opacity 200ms;
-					opacity: 1;
+						stroke-dashoffset calc(var(--transition-short) * 4),
+						stroke calc(var(--transition-short) * 4);
 
-					&.hidden {
-						opacity: 0;
+					&.done {
+						stroke: color-mix(in srgb, var(--brand) 50%, transparent);
+					}
+
+					&:not(.done) {
+						transition: none;
 					}
 				}
 			}
@@ -234,7 +260,7 @@
 				width: 100%;
 				height: 100%;
 				object-fit: cover;
-				border-radius: 0.5rem;
+				border-radius: 0.3rem;
 			}
 
 			span {
@@ -281,10 +307,15 @@
 
 		@media (width <= 768px) {
 			width: 90%;
+			height: 13rem;
 		}
 
 		span {
 			font-size: 1.5rem;
+
+			@media (width <= 768px) {
+				font-size: 1.3rem;
+			}
 		}
 	}
 </style>

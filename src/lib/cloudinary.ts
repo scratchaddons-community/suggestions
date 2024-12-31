@@ -2,8 +2,8 @@ import { PUBLIC_CLOUDINARY_KEY, PUBLIC_CLOUDINARY_NAME } from "$env/static/publi
 import { defaults } from "$lib";
 
 type ProgressCallback = (progress: number) => void;
-type SuccessCallback = (result: UploadApiResponse) => void;
-type ErrorCallback = (error: UploadApiErrorResponse) => void;
+type SuccessCallback = (result: App.UploadApiResponse) => void;
+type ErrorCallback = (error: App.UploadApiErrorResponse) => void;
 
 class CloudinaryUploader {
 	private progressCallback?: ProgressCallback;
