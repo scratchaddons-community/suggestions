@@ -15,37 +15,6 @@
 
 	let submitting = $state(false);
 	let valid = $state(true);
-	let imagesContainer = $state() as HTMLDivElement;
-
-	function handleAddImages() {
-		const filePicker = document.createElement("input");
-		filePicker.type = "file";
-		filePicker.multiple = true;
-		filePicker.accept = "image/*";
-		filePicker.click();
-
-		filePicker.onchange = () => {
-			const files = Array.from(filePicker.files || []);
-
-			if (files.length > 0) {
-				images = images.concat(files);
-				const fileList = files.map((file) => file.name);
-				console.log(fileList);
-				console.log(files);
-
-				files.forEach(async (file) => {
-					const reader = new FileReader();
-					reader.onloadend = async () => {
-						console.log(reader.result);
-						const image = document.createElement("img");
-						image.src = reader.result as string;
-						imagesContainer.appendChild(image);
-					};
-					reader.readAsDataURL(file);
-				});
-			}
-		};
-	}
 </script>
 
 <div class="add-suggestion">

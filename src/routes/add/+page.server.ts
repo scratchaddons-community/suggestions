@@ -25,7 +25,6 @@ export const actions: Actions = {
 		const parsedTag = (
 			JSON.parse(formTag as string) as { value: (typeof tag.enumValues)[number]; label: string }
 		).value;
-		console.log("🚀 ~ suggestion: ~ parsedTags:", parsedTag);
 
 		await sleep(1000);
 
@@ -38,6 +37,5 @@ export const actions: Actions = {
 			tag: parsedTag,
 		});
 
-		console.log("Successfully added suggestion");
 	},
 };

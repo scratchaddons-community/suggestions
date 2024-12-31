@@ -39,7 +39,7 @@ class CloudinaryUploader {
 
 		const dataToSign = { upload_preset: defaults.uploadPreset, folder: defaults.folder };
 
-		const response = await fetch("/signature", {
+		const response = await fetch("/api/signature", {
 			method: "POST",
 			body: JSON.stringify({
 				dataToSign,
@@ -62,7 +62,7 @@ class CloudinaryUploader {
 			formData.append("folder", signedData.folder);
 
 			const xhr = new XMLHttpRequest();
-			xhr.onreadystatechange = () => {
+			xhr.onreadystatechange = async () => {
 				if (xhr.readyState !== 4) return;
 
 				if (xhr.status !== 200) {
@@ -73,7 +73,7 @@ class CloudinaryUploader {
 				}
 
 				try {
-					const res = JSON.parse(xhr.responseText);
+					const res: App.UploadApiResponse = JSON.parse(xhr.responseText);
 					if (!res || !res.public_id) {
 						const error = new Error("Invalid response from Cloudinary");
 						this.errorCallback?.({ ...error, http_code: xhr.status });
@@ -81,15 +81,49 @@ class CloudinaryUploader {
 						return;
 					}
 
+					const imageUrl = res.secure_url;
+					if (!imageUrl) {
+						this.errorCallback?.({
+							message: "Invalid response from Cloudinary",
+							http_code: xhr.status,
+							name: "invalid-response",
+						});
+						return;
+					}
+
+					const request = new Request(`/api/image/moderation`, {
+						method: "POST",
+						body: JSON.stringify({ imageUrl }),
+					});
+
+					const response = await fetch(request);
+
+					const moderationResponse: App.ModerationResult = await response.json();
+
+					const results = moderationResponse.data.analysis.responses.map(
+						(response) => response.value,
+					);
+					const nsfw = results.includes("yes");
+
+					if (nsfw) {
+						await cloudinary.delete(res.public_id, null);
+						this.errorCallback?.({
+							message: "Image has been flagged as NSFW",
+							name: "nsfw",
+							http_code: 403,
+						});
+						return;
+					}
+
 					this.successCallback?.(res);
 					resolve(res);
 				} catch (error) {
 					this.errorCallback?.({
-						...(error as Error),
 						http_code: xhr.status,
 						message: (error as Error).message,
+						name: (error as Error).name,
 					});
-					reject(error);
+					return;
 				}
 			};
 
@@ -109,12 +143,12 @@ export const cloudinary = {
 	upload: (imageData: string) => {
 		return new CloudinaryUploader(imageData);
 	},
-	delete: async (publicId: string, imageId: string) => {
+	delete: async (publicId: string, imageId: string | null) => {
 		if (!publicId) return { message: "Falsy publicId" };
 
 		const dataToSign = { public_id: publicId };
 
-		const response = await fetch("/signature", {
+		const response = await fetch("/api/signature", {
 			method: "POST",
 			body: JSON.stringify({
 				dataToSign,

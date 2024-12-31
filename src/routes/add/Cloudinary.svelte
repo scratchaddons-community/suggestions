@@ -150,8 +150,8 @@
 
 								try {
 									const response = await cloudinary.delete(image.cloudinaryId || "", image.id);
-									if (typeof response === "object") throw new Error(response.message);
-									removeImage(response);
+									if (typeof response === "object" && response) throw new Error(response.message);
+									if (response) removeImage(response);
 
 									// This does not work, and I am not sure why. The logs are...something. Take a look at wtf.png
 									// if you log image.id and response, you will see they don't match

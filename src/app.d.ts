@@ -42,6 +42,26 @@ declare global {
 
 			[futureKey: string]: unknown;
 		}
+
+		interface ModerationResult {
+			limits: {
+				usage: {
+					type: string;
+					count: number;
+				};
+			};
+			request_id: string;
+			data: {
+				entity: string;
+				analysis: {
+					responses: {
+						prompt: string;
+						value: string;
+					}[];
+					model_version: number;
+				};
+			};
+		}
 	}
 }
 
