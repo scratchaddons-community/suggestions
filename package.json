@@ -8,6 +8,7 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"db:migrate": "drizzle-kit migrate",
+		"db:generate": "drizzle-kit generate --name sa-suggestions",
 		"db:push": "drizzle-kit push --force",
 		"db:start": "docker compose up",
 		"db:studio": "drizzle-kit studio",
