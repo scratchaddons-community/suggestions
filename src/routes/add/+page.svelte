@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from "$app/forms";
 	import Select from "svelte-select";
-	import { labels } from "$lib";
+	import { labels, maxImages } from "$lib";
 	import { goto } from "$app/navigation";
 	import Cloudinary from "./Cloudinary.svelte";
 
@@ -10,11 +10,21 @@
 
 	const allTags = [...tags];
 	const selectOptions = allTags.map((tag) => ({ value: tag, label: labels[tag] }));
-	let images: File[] = $state([]);
-	$inspect(images);
 
 	let submitting = $state(false);
 	let valid = $state(true);
+	let imagesUploading = $state(false);
+
+	let images: App.Image[] = $state([]);
+	$inspect(images);
+
+	function updateImages(newImages: App.Image[]) {
+		// Image might be too big to send to the server, so I remove it :D
+		images = newImages.map((image) => ({ ...image, base64: "" }));
+
+		const statuses = newImages.map((image) => image.status);
+		imagesUploading = statuses.includes("uploading");
+	}
 </script>
 
 <div class="add-suggestion">
@@ -28,7 +38,11 @@
 				return async ({ result }) => {
 					console.log("🚀 ~ return ~ result:", result);
 					if (result.type === "success") submitting = false;
-					if (result.status !== 400) goto("/");
+					if (result.status === 200) goto("/");
+
+					if (result.type === "failure") {
+						alert(result.data?.message ?? "Something went wrong");
+					}
 				};
 			}}
 			action="?/suggestion"
@@ -37,12 +51,14 @@
 			<textarea name="description" placeholder="Description" required minlength={5} maxlength={1000}
 			></textarea>
 
+			<input name="images" type="text" value={JSON.stringify(images)} hidden />
+
 			<Select placeholder="Tag" items={selectOptions} name="tag" required searchable={false} />
 
-			<button type="submit" disabled={submitting || !valid}>Submit</button>
+			<button type="submit" disabled={submitting || !valid || imagesUploading}>Submit</button>
 		</form>
 
-		<Cloudinary />
+		<Cloudinary {updateImages} />
 	</div>
 </div>
 

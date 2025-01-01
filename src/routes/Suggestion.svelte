@@ -4,6 +4,7 @@
 	import type { Image, Session, Suggestion, User } from "$lib/server/db/schema";
 	import { fade, fly } from "svelte/transition";
 	import { labels } from "$lib";
+	import { generateUrl } from "$lib/cloudinary/url";
 
 	type Props = {
 		suggestion: {
@@ -141,10 +142,13 @@
 	{#await getImages then images}
 		{#each images as image}
 			{#if suggestion.imageIds && suggestion.imageIds[0] === image.id}
+				{@const url = image.cloudinaryId
+					? generateUrl(image.cloudinaryId, undefined, "thumbnail")
+					: image.url}
 				<div class="images">
 					<!-- svelte-ignore a11y_missing_attribute -->
 					<img
-						src={image.url}
+						src={url}
 						onload={(e) => {
 							const target = e.target as HTMLImageElement;
 							target.style.opacity = "1";

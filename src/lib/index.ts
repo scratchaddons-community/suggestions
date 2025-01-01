@@ -43,3 +43,5 @@ export const defaults = {
 	uploadPreset: "testing",
 	folder: "sa",
 };
+
+export const maxImages = 5;

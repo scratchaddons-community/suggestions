@@ -97,7 +97,7 @@ Then, go to the "API Keys" tab under "Product environment settings", and copy th
 I recommend setting on cloudinary an incoming transformation that will essentially limit the size of the image and set the format and quality to something reasonable. This WILL cost you a transform for every uploaded image, but it will also reduce the file size that you need to store. You can also set an eager transform for creating the thumbnails, but this will cost you a transform for every image, even ones that the user deletes instantly. It is worth it only for the incoming transform.
 
 `c_limit,w_6000,h_6000,f_webp,q_auto` - Incoming
-`c_limit/w_400/f_avif/q_auto:low/if_h_gt_4000/h_4000/if_end` - Thumbnail
+`c_limit/w_600/f_avif/q_auto:low/if_h_gt_4000/h_4000/if_end` - Thumbnail
 
 I also recommend deploying this project to **[Vercel](https://vercel.com/)** for production, as I have had issues with Cloudflare Pages. This may have been fixed by now, as I recently removed the Cloudinary package from the images test, which was not runtime agnostic. I'll try it now and report back lol. It totally works, I am a genius.
 

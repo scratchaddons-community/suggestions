@@ -138,8 +138,4 @@
 			max-width: 90%;
 		}
 	}
-
-	a {
-		color: var(--brand);
-	}
 </style>

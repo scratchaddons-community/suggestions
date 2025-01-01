@@ -1,26 +1,35 @@
 <script lang="ts">
+	import { page } from "$app/state";
 	import { SA } from "$lib/icons";
 </script>
 
 <footer>
 	<div class="footer-inner">
 		<div class="top">
-			<a class="icon" href="https://sa-suggestions.vercel.app/">
+			<a class="brand" href="https://sa-suggestions.vercel.app/">
 				<SA />
 				SA Suggestions
 			</a>
 			<div class="links">
 				<a href="https://github.com/Jazza-231/sa-suggestions">Repository</a>
 				<a href="https://scratchaddons.com/">Scratch Addons</a>
+				<a href="/about">About</a>
 			</div>
 		</div>
 
 		<div class="bottom">
-			<div class="disclaimer">
-				This website is NOT official, and IS a work in progress. Please see the <a href="privacy"
-					>privacy policy</a
-				> for information on the data we use.
-			</div>
+			{#if !page.error}
+				<div class="disclaimer">
+					This website is NOT official, and IS a work in progress. Please see the <a href="privacy"
+						>privacy policy</a
+					> for information on the data we use.
+				</div>
+			{:else}
+				<div class="error">
+					This website is NOT official, and IS broken (apparently, you are on an error page). Please
+					see the <a href="privacy">privacy policy</a> for information on the data we use.
+				</div>
+			{/if}
 		</div>
 	</div>
 </footer>
@@ -31,10 +40,6 @@
 		justify-content: center;
 		flex-shrink: 0;
 		margin-block-start: 1rem;
-
-		a {
-			color: var(--brand);
-		}
 
 		.footer-inner {
 			display: flex;
@@ -50,8 +55,10 @@
 			border-top-right-radius: 0.5rem;
 			box-shadow: var(--footer-drop-shadow);
 
-			.icon {
+			.brand {
 				display: flex;
+				align-items: center;
+				justify-content: center;
 				text-decoration: none;
 				font-size: 1.5rem;
 				font-weight: bold;
@@ -69,10 +76,12 @@
 
 			.links {
 				display: flex;
-				gap: 1rem;
+				gap: 0.5rem;
+				margin-block-start: 0.5rem;
 			}
 
-			.disclaimer {
+			.disclaimer,
+			.error {
 				margin-block-start: 1rem;
 			}
 		}

@@ -91,30 +91,6 @@ class CloudinaryUploader {
 						return;
 					}
 
-					const request = new Request(`/api/image/moderation`, {
-						method: "POST",
-						body: JSON.stringify({ imageUrl }),
-					});
-
-					const response = await fetch(request);
-
-					const moderationResponse: App.ModerationResult = await response.json();
-
-					const results = moderationResponse.data.analysis.responses.map(
-						(response) => response.value,
-					);
-					const nsfw = results.includes("yes");
-
-					if (nsfw) {
-						await cloudinary.delete(res.public_id, null);
-						this.errorCallback?.({
-							message: "Image has been flagged as NSFW",
-							name: "nsfw",
-							http_code: 403,
-						});
-						return;
-					}
-
 					this.successCallback?.(res);
 					resolve(res);
 				} catch (error) {

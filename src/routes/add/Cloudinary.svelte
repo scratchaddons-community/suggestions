@@ -1,28 +1,22 @@
 <script lang="ts">
-	import { cloudinary } from "$lib/cloudinary";
+	import { cloudinary } from "$lib/cloudinary/interact";
 	import { Tween } from "svelte/motion";
 	import { cubicInOut } from "svelte/easing";
 	import { Delete } from "$lib/icons";
+	import { maxImages } from "$lib";
 
-	interface Image {
-		id: string;
-		name: string;
-		arrayBuffer: ArrayBuffer;
-		base64?: string;
-		progressTween?: Tween<number>;
-		status?: "uploading" | "uploaded" | "failed" | "deleting" | "errorDeleting";
-		url?: string;
-		folder?: string;
-		cloudinaryId?: string;
-		dimensions?: {
-			width: number;
-			height: number;
-		};
-		error?: Error;
-	}
+	const { updateImages } = $props();
 
-	let images: Image[] = $state([]);
+	let images: App.Image[] = $state([]);
 	$inspect(images);
+
+	$effect(() => {
+		if (images.length > maxImages) {
+			alert(`You can only upload ${maxImages} images`);
+			return;
+		}
+		updateImages(images);
+	});
 
 	function addImage(id: string, name: string, arrayBuffer: ArrayBuffer) {
 		if (images.map((image) => image.id).indexOf(id) === -1) {
@@ -31,7 +25,7 @@
 		}
 	}
 
-	function updateImage(id: string, { ...args }: Partial<Image>) {
+	function updateImage(id: string, { ...args }: Partial<App.Image>) {
 		const imageIndex = images.findIndex((image) => image.id === id);
 		if (imageIndex !== -1) {
 			images[imageIndex] = { ...images[imageIndex], ...args };
@@ -69,6 +63,10 @@
 	}
 
 	async function handleFiles(files: File[]) {
+		if (files.length > maxImages || images.length > maxImages - 1) {
+			alert(`You can only upload ${maxImages} images`);
+			return;
+		}
 		for (const file of files) {
 			const id = crypto.randomUUID();
 

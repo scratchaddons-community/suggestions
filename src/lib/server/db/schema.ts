@@ -32,6 +32,7 @@ export const image = pgTable("image", {
 	id: text("id").primaryKey(),
 	url: text("url").notNull(),
 	resolution: json("resolution").$type<{ x: number; y: number }>(),
+	cloudinaryId: text("cloudinary_id").unique(),
 });
 
 export const suggestion = pgTable("suggestion", {

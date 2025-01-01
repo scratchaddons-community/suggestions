@@ -62,6 +62,23 @@ declare global {
 				};
 			};
 		}
+
+		interface Image {
+			id: string;
+			name: string;
+			arrayBuffer: ArrayBuffer;
+			base64?: string;
+			progressTween?: Tween<number>;
+			status?: "uploading" | "uploaded" | "failed" | "deleting" | "errorDeleting";
+			url?: string;
+			folder?: string;
+			cloudinaryId?: string;
+			dimensions?: {
+				width: number;
+				height: number;
+			};
+			error?: Error;
+		}
 	}
 }
 

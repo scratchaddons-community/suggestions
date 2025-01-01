@@ -80,6 +80,7 @@ header button:not(.omit-styles) {
 
 code {
 	background-color: var(--surface1);
+	transition: background-color var(--transition-short);
 	padding: 0.15rem 0.3rem;
 	border-radius: 0.1rem;
 }
@@ -109,5 +110,15 @@ textarea {
 	&:focus {
 		border: var(--brand) 2px solid;
 		outline: none;
+	}
+}
+
+a {
+	color: var(--brand);
+	transition: text-underline-offset var(--transition-short);
+	text-underline-offset: 0.1rem;
+
+	&:hover {
+		text-underline-offset: 0.2rem;
 	}
 }
