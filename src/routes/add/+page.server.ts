@@ -13,7 +13,7 @@ export const load = (async ({ locals: { session } }) => {
 }) satisfies PageServerLoad;
 
 export const actions: Actions = {
-	suggestion: async ({ request, locals: { user }, fetch }) => {
+	suggestion: async ({ request, locals: { user }, fetch: sveltekitFetch }) => {
 		if (!user) return { status: 401 };
 
 		const formData = await request.formData();
@@ -37,7 +37,7 @@ export const actions: Actions = {
 			try {
 				await Promise.all(
 					formImages.map(async (image) => {
-						const response = await fetch("/api/image/moderation", {
+						const response = await sveltekitFetch("/api/image/moderation", {
 							method: "POST",
 							body: JSON.stringify({ imageUrl: image.url }),
 						});
@@ -50,7 +50,7 @@ export const actions: Actions = {
 						const nsfw = results.includes("yes");
 
 						if (nsfw) {
-							await cloudinary.delete(image.cloudinaryId || "", image.id);
+							await cloudinary.delete(image.cloudinaryId || "", image.id, sveltekitFetch);
 							// Strike user for being an idiot
 							// THAT WAS THE AUTO COMPLETE WHAT 😂😂😂😂😂
 							throw new Error("Image has been flagged as NSFW");
@@ -72,7 +72,6 @@ export const actions: Actions = {
 					}),
 				);
 			} catch (error) {
-				console.error(error);
 				return fail(500, { message: (error as Error).message });
 			}
 		}

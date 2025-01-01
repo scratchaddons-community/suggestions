@@ -27,8 +27,6 @@ export const POST: RequestHandler = async ({ request }) => {
 	const moderationResponse = await fetch(moderationRequest);
 	const result: App.ModerationResult = await moderationResponse.json();
 
-	console.log(result.data.analysis);
-
 	return new Response(JSON.stringify({ ...result }), {
 		headers: {
 			"Content-Type": "application/json",

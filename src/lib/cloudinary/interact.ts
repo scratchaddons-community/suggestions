@@ -119,7 +119,9 @@ export const cloudinary = {
 	upload: (imageData: string) => {
 		return new CloudinaryUploader(imageData);
 	},
-	delete: async (publicId: string, imageId: string | null) => {
+
+	// fetch param is so that it works on the server side, it uses a custom fetch from sveltekit
+	delete: async (publicId: string, imageId: string | null, fetch = window.fetch) => {
 		if (!publicId) return { message: "Falsy publicId" };
 
 		const dataToSign = { public_id: publicId };
