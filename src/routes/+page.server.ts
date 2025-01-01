@@ -179,7 +179,7 @@ async function getPage(
 	switch (sort) {
 		default:
 			sortBy = sql`
-				array_length(${table.suggestion.voterIds}, 1) / 
+				COALESCE(array_length(${table.suggestion.voterIds}, 1), 0) / 
 				POWER(((EXTRACT(EPOCH FROM NOW()) * 1000) - EXTRACT(EPOCH FROM ${table.suggestion.createdAt}) *1000) /
 				(1000 * 60 * 60 * 24) + 1, 10) DESC
 			`;
@@ -191,10 +191,10 @@ async function getPage(
 			sortBy = asc(table.suggestion.createdAt);
 			break;
 		case "most":
-			sortBy = sql`array_length(${table.suggestion.voterIds}, 1) DESC`;
+			sortBy = sql`COALESCE(array_length(${table.suggestion.voterIds}, 1), 0) DESC`;
 			break;
 		case "least":
-			sortBy = sql`array_length(${table.suggestion.voterIds}, 1) ASC`;
+			sortBy = sql`COALESCE(array_length(${table.suggestion.voterIds}, 1), 0) ASC`;
 			break;
 	}
 
