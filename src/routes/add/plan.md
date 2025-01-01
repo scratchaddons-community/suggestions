@@ -14,17 +14,17 @@
   - [ ] If not, delete image, show error, take action
 - [x] Receive deletion request from UI
 - [x] Make signature on server and delete based off public_id
-- [ ] Add images to database on submit
+- [x] Add images to database on submit
 
-Optional:
+## TODO
 
-- [ ] Use a Server Side Event to listen for eager transformations finishing
+- [ ] Images do not keep their order
 
 ## Features
 
-- [ ] Choosing multiple images
-- [ ] Drag and drop
-- [ ] Show progress such as "pending", a percentage / visual percentage, and "done"
-- [ ] A preview of the image
-- [ ] Deletion of images
-- [ ] Blocking of submission until all images are uploaded
+- [x] Choosing multiple images
+- [x] Drag and drop
+- [x] Show progress such as "pending", a percentage / visual percentage, and "done"
+- [x] A preview of the image
+- [x] Deletion of images
+- [x] Blocking of submission until all images are uploaded

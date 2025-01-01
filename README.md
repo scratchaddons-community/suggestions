@@ -59,9 +59,9 @@ Now, the reason I am writing this readme...
 - [ ] Find a way to improve performance? I'm sure my database queries suck
 - [x] This includes streaming of data on main page, and not invalidating data on nav to account or add suggestion, i think cuz in the page load it checks for the user from locals
 - [x] ...actually allow users to add suggestions
-- [ ] That includes images Jazza!! - Probably cloudinary or imagekit
+- [x] That includes images Jazza!! - Probably cloudinary or imagekit
 - [ ] Add tips on making a good suggestion
-- [ ] Make suggestions be openable?
+- [ ] Make suggestions be openable
 - [ ] Add manual verification for github accounts - these are for devs only
 - [ ] Permissions such as admin roles
 - [ ] Infinite scrolling?
