@@ -5,6 +5,7 @@
 	import { Sun, Moon } from "$lib/icons";
 	import Add from "$lib/icons/Add.svelte";
 	import Profile from "$lib/icons/Profile.svelte";
+	import icon from "$lib/images/icon.svg";
 
 	const { session } = $props();
 
@@ -55,12 +56,12 @@
 	<nav>
 		{#if typeof suggestionsPage !== "undefined"}
 			<a href="/" class="icon" data-sveltekit-reload>
-				<img src="/icon.svg" alt="Scratch Addons" />
+				<img src={icon} alt="Scratch Addons" />
 				<span>Scratch Addons Suggestions</span>
 			</a>
 		{:else}
 			<a href="/" class="icon">
-				<img src="/icon.svg" alt="Scratch Addons" />
+				<img src={icon} alt="Scratch Addons" />
 				<span>Scratch Addons Suggestions</span>
 			</a>
 		{/if}
