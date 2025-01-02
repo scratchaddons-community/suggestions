@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { browser } from "$app/environment";
 	import { goto, preloadData } from "$app/navigation";
-	import { page } from "$app/stores";
+	import { page } from "$app/state";
 	import { Sun, Moon } from "$lib/icons";
 	import Add from "$lib/icons/Add.svelte";
 	import Profile from "$lib/icons/Profile.svelte";
@@ -10,7 +10,7 @@
 
 	let theme: "dark" | "light" = $state()!;
 	let setTheme: Function = $state()!;
-	const suggestionsPage = $state($page.url.searchParams.get("page") || undefined);
+	const suggestionsPage = $state(page.url.searchParams.get("page") || undefined);
 
 	if (browser) {
 		theme = localStorage.theme;

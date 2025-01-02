@@ -7,7 +7,9 @@ import * as table from "$lib/server/db/schema";
 import { eq } from "drizzle-orm";
 import { OAUTH_CALLBACK_URL } from "$env/static/private";
 
-export const load: PageServerLoad = async ({ url, cookies }) => {
+export const load: PageServerLoad = async (event) => {
+	const { url } = event;
+
 	const searchParams = new URLSearchParams(url.search);
 	const code = searchParams.get("code");
 	const state = searchParams.get("state");
@@ -72,9 +74,10 @@ export const load: PageServerLoad = async ({ url, cookies }) => {
 
 	[dbUser] = await db.select().from(table.user).where(eq(table.user.oauthId, oauthId));
 
-	const session = await auth.createSession(dbUser.id);
+	const sessionToken = auth.generateSessionToken();
+	const session = await auth.createSession(sessionToken, dbUser.id);
 
-	cookies.set(auth.sessionCookieName, session.id, { path: "/" });
+	auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
 
 	redirect(302, "/account");
 };

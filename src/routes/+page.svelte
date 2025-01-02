@@ -7,7 +7,6 @@
 	import Select from "svelte-select";
 	import { browser } from "$app/environment";
 	import type { ActionResult } from "@sveltejs/kit";
-	import type { PageData } from "./$types.js";
 	import { labels } from "$lib";
 
 	type returnedSuggestion = {
