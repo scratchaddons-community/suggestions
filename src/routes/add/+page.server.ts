@@ -6,8 +6,12 @@ import { fail, redirect, type Actions } from "@sveltejs/kit";
 import type { PageServerLoad } from "../$types";
 import { cloudinary } from "$lib/cloudinary/interact";
 
-export const load = (async ({ locals: { session } }) => {
+export const load = (async ({ locals: { session }, setHeaders }) => {
 	if (!session) redirect(302, "/login");
+
+	setHeaders({
+		"Cache-Control": "max-age=3600",
+	});
 
 	return { tags: tag.enumValues };
 }) satisfies PageServerLoad;

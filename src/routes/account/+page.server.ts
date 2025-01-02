@@ -5,8 +5,12 @@ import { db } from "$lib/server/db";
 import { mockImage, mockSuggestion } from "$lib/mockData";
 import { table } from "$lib/server";
 
-export const load = (async ({ locals: { user } }) => {
+export const load = (async ({ locals: { user }, setHeaders }) => {
 	if (!user) redirect(302, "/login");
+
+	setHeaders({
+		"Cache-Control": "max-age=60",
+	});
 
 	return { user };
 }) satisfies PageServerLoad;
@@ -18,7 +22,7 @@ export const actions: Actions = {
 		} = event;
 
 		if (!session) {
-			return fail(401);
+			return fail(401, { message: "Could not log out, no session found." });
 		}
 		await auth.invalidateSession(session.id);
 		auth.deleteSessionTokenCookie(event);
