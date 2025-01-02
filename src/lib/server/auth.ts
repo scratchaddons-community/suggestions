@@ -1,34 +1,24 @@
 import { eq } from "drizzle-orm";
 import { sha256 } from "@oslojs/crypto/sha2";
-import { encodeBase32LowerCaseNoPadding, encodeHexLowerCase } from "@oslojs/encoding";
+import { encodeBase64url, encodeHexLowerCase } from "@oslojs/encoding";
 import { db } from "$lib/server/db";
 import * as table from "$lib/server/db/schema";
 import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, OAUTH_CALLBACK_URL } from "$env/static/private";
 import { GitHub } from "arctic";
+import type { RequestEvent } from "@sveltejs/kit";
 
 const DAY_IN_MS = 1000 * 60 * 60 * 24;
 
 export const sessionCookieName = "auth-session";
 
-function generateSessionToken(): string {
-	const bytes = crypto.getRandomValues(new Uint8Array(20));
-	const token = encodeBase32LowerCaseNoPadding(bytes);
+export function generateSessionToken() {
+	const bytes = crypto.getRandomValues(new Uint8Array(18));
+	const token = encodeBase64url(bytes);
 	return token;
 }
 
-export async function createSession(userId: string): Promise<table.Session> {
-	const token = generateSessionToken();
+export async function createSession(token: string, userId: string) {
 	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
-
-	const existingSession = await db
-		.select()
-		.from(table.session)
-		.where(eq(table.session.userId, userId));
-
-	if (existingSession[0]) {
-		return existingSession[0];
-	}
-
 	const session: table.Session = {
 		id: sessionId,
 		userId,
@@ -38,11 +28,8 @@ export async function createSession(userId: string): Promise<table.Session> {
 	return session;
 }
 
-export async function invalidateSession(sessionId: string): Promise<void> {
-	await db.delete(table.session).where(eq(table.session.id, sessionId));
-}
-
-export async function validateSession(sessionId: string) {
+export async function validateSessionToken(token: string) {
+	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
 	const [result] = await db
 		.select({
 			// Adjust user table here to tweak returned data
@@ -80,6 +67,23 @@ export async function validateSession(sessionId: string) {
 	return { session, user };
 }
 
-export type SessionValidationResult = Awaited<ReturnType<typeof validateSession>>;
+export type SessionValidationResult = Awaited<ReturnType<typeof validateSessionToken>>;
+
+export async function invalidateSession(sessionId: string) {
+	await db.delete(table.session).where(eq(table.session.id, sessionId));
+}
+
+export function setSessionTokenCookie(event: RequestEvent, token: string, expiresAt: Date) {
+	event.cookies.set(sessionCookieName, token, {
+		expires: expiresAt,
+		path: "/",
+	});
+}
+
+export function deleteSessionTokenCookie(event: RequestEvent) {
+	event.cookies.delete(sessionCookieName, {
+		path: "/",
+	});
+}
 
 export const github = new GitHub(GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, OAUTH_CALLBACK_URL);
