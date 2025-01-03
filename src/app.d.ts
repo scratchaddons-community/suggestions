@@ -63,6 +63,18 @@ declare global {
 			};
 		}
 
+		interface ModerationError {
+			error: {
+				category: string;
+				code: string;
+				message: string;
+				details: {
+					message: string;
+				};
+				request_id: string;
+			};
+		}
+
 		interface Image {
 			id: string;
 			name: string;

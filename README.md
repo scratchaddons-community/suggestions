@@ -56,9 +56,10 @@ Now, the reason I am writing this readme...
 ## TODO
 
 - [ ] Rewrite the services section to differentiate instructions between production and development
+- [ ] Replace all alerts with toasts (both blocking and non-blocking) - [why?](https://www.telerik.com/blogs/how-to-do-javascript-alerts-without-being-a-jerk)
 - [ ] Add Upstash to the privacy policy
 - [ ] Add a new display mode to show more suggestions compactly
-- [ ] Find a way to improve performance? I'm sure my database queries suck
+- [x] Find a way to improve performance? I'm sure my database queries suck
 - [x] This includes streaming of data on main page, and not invalidating data on nav to account or add suggestion, i think cuz in the page load it checks for the user from locals
 - [x] ...actually allow users to add suggestions
 - [x] That includes images Jazza!! - Probably cloudinary or imagekit

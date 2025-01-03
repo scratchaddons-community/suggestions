@@ -3,7 +3,7 @@
 	import { Tween } from "svelte/motion";
 	import { cubicInOut } from "svelte/easing";
 	import { Delete } from "$lib/icons";
-	import { maxImages } from "$lib";
+	import { maxImages, maxImageSize } from "$lib";
 
 	const { updateImages } = $props();
 
@@ -20,7 +20,7 @@
 
 	function addImage(id: string, name: string, arrayBuffer: ArrayBuffer) {
 		if (images.map((image) => image.id).indexOf(id) === -1) {
-			const progressTween = new Tween(0, { duration: 1000, easing: cubicInOut });
+			const progressTween = new Tween(0, { duration: 1_000, easing: cubicInOut });
 			images.push({ id, name, arrayBuffer, progressTween });
 		}
 	}
@@ -67,7 +67,13 @@
 			alert(`You can only upload ${maxImages} images`);
 			return;
 		}
+
 		for (const file of files) {
+			if (file.size > maxImageSize) {
+				alert(`You can only upload images smaller than ${maxImageSize / 1_000_000}MB`);
+				continue;
+			}
+
 			const id = crypto.randomUUID();
 
 			addImage(id, file.name, await file.arrayBuffer());
@@ -175,7 +181,7 @@
 				<svg
 					class="progress-border"
 					viewBox="0 0 100 100"
-					xmlns="http://www.w3.org/2000/svg"
+					xmlns="http://www.w3.org/2_000/svg"
 					fill="none"
 				>
 					<rect

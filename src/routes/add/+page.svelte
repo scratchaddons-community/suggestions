@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from "$app/forms";
 	import Select from "svelte-select";
-	import { labels, maxImages } from "$lib";
+	import { labels } from "$lib";
 	import { goto } from "$app/navigation";
 	import Cloudinary from "./Cloudinary.svelte";
 
@@ -23,7 +23,9 @@
 		images = newImages.map((image) => ({ ...image, base64: "" }));
 
 		const statuses = newImages.map((image) => image.status);
-		imagesUploading = statuses.includes("uploading");
+		imagesUploading =
+			statuses.includes("uploading") ||
+			statuses.filter((status) => status === undefined).length > 0;
 	}
 </script>
 
@@ -35,9 +37,9 @@
 			method="POST"
 			use:enhance={() => {
 				submitting = true;
+
 				return async ({ result }) => {
-					console.log("🚀 ~ return ~ result:", result);
-					if (result.type === "success") submitting = false;
+					submitting = false;
 					if (result.status === 200) goto("/");
 
 					if (result.type === "failure") {
@@ -47,8 +49,13 @@
 			}}
 			action="?/suggestion"
 		>
-			<input type="text" name="title" placeholder="Title" required minlength="3" maxlength="100" />
-			<textarea name="description" placeholder="Description" required minlength={5} maxlength={1000}
+			<input type="text" name="title" placeholder="Title" required minlength={3} maxlength={100} />
+			<textarea
+				name="description"
+				placeholder="Description"
+				required
+				minlength={5}
+				maxlength={1_000}
 			></textarea>
 
 			<input name="images" type="text" value={JSON.stringify(images)} hidden />

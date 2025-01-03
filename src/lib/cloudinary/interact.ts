@@ -93,11 +93,11 @@ class CloudinaryUploader {
 
 					this.successCallback?.(res);
 					resolve(res);
-				} catch (error) {
+				} catch {
 					this.errorCallback?.({
 						http_code: xhr.status,
-						message: (error as Error).message,
-						name: (error as Error).name,
+						message: "Error uploading image",
+						name: "Image",
 					});
 					return;
 				}
