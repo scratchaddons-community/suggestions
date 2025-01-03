@@ -55,6 +55,8 @@ Now, the reason I am writing this readme...
 
 ## TODO
 
+- [ ] Rewrite the services section to differentiate instructions between production and development
+- [ ] Add Upstash to the privacy policy
 - [ ] Add a new display mode to show more suggestions compactly
 - [ ] Find a way to improve performance? I'm sure my database queries suck
 - [x] This includes streaming of data on main page, and not invalidating data on nav to account or add suggestion, i think cuz in the page load it checks for the user from locals
@@ -77,14 +79,17 @@ Now, the reason I am writing this readme...
 To run this project, you will need the following additional services:
 
 - [Neon](https://neon.tech/)
+- [Upstash](https://upstash.com/)
 - [A GitHub OAUTH application](https://github.com/settings/applications/new)
 - [Cloudinary](https://cloudinary.com/)
 
 Create a **Neon** account, and then create a new project. Choose a name and postgres version 17. You will be redirected to `https://console.neon.tech/app/projects/<project-name>/quickstart`, where you can easily copy the postgres snippet, and paste this into the .env file.
 
+Create a **Upstash** account, and then create a new Redis database. You should be redirected to `https://console.upstash.com/redis/<something></something>?tab=details&teamid=0`, where you can easily copy the endpoint, password, and port, and paste that into the appropriate places in the .env file.
+
 For the **GitHub OAUTH application**, follow the above link and create a new application. Choose a name, set the homepage URL to `http://localhost:5173`, and the callback URL to `http://localhost:5173/auth/callback/`. Make sure the value in the .env file is set to this callback URL.
 
-Note: This is for development. Replace with whatever your domain is in production.
+Note: This is for development. Replace with whatever your domain is in production when actually deploying.
 
 Create a **Cloudinary** account. Choose "Coding with APIs and SDKs". Navigate to settings, and then to "Product Environments" under "Account settings". Choose the three dots next to "Active" and select "Edit". Set your cloud name to whatever you would like, and save changes.
 

@@ -1,3 +1,4 @@
+// src/routes/auth/callback/+page.server.ts
 import { redirect } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 import { github } from "$lib/server/auth";
@@ -6,6 +7,7 @@ import { db } from "$lib/server/db";
 import * as table from "$lib/server/db/schema";
 import { eq } from "drizzle-orm";
 import { OAUTH_CALLBACK_URL } from "$env/static/private";
+import { DAY_IN_MS } from "$lib";
 
 export const load: PageServerLoad = async (event) => {
 	const { url } = event;
@@ -75,9 +77,13 @@ export const load: PageServerLoad = async (event) => {
 	[dbUser] = await db.select().from(table.user).where(eq(table.user.oauthId, oauthId));
 
 	const sessionToken = auth.generateSessionToken();
-	const session = await auth.createSession(sessionToken, dbUser.id);
+	await auth.createSession(sessionToken, {
+		id: dbUser.id,
+		username: dbUser.username,
+		displayName: dbUser.displayName || "",
+	});
 
-	auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
+	auth.setSessionTokenCookie(event, sessionToken, new Date(Date.now() + 30 * DAY_IN_MS));
 
 	redirect(302, "/account");
 };

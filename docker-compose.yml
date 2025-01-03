@@ -8,3 +8,9 @@ services:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: mysecretpassword
       POSTGRES_DB: local
+
+  redis:
+    image: redis
+    restart: always
+    ports:
+      - 6379:6379

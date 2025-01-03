@@ -49,18 +49,18 @@
 	});
 
 	const classStyles = {
-		rejected: "#ff000080",
-		impossible: "#ff000080",
-		impractical: "#ff7b2680",
-		incompatible: "#ff7b2680",
-		implemented: "#00800080",
+		rejected: "#ff000_080",
+		impossible: "#ff000_080",
+		impractical: "#ff7b2_680",
+		incompatible: "#ff7b2_680",
+		implemented: "#00_800_080",
 		pending: "#37acff80",
-		good: "#6db02180",
-		"in-dev": "#ffff0080",
+		good: "#6db02_180",
+		"in-dev": "#ffff0_080",
 	};
 </script>
 
-<!-- out:fade|global={reverseStaggeredDelay(length, index, 200, 25, 1000)} -->
+<!-- out:fade|global={reverseStaggeredDelay(length, index, 200, 25, 1_000)} -->
 <div
 	class="suggestion"
 	in:fly|global={{ duration: 400, y: 100, delay: index * 100 }}
@@ -288,7 +288,8 @@
 			}
 
 			img {
-				width: auto;
+				width: 100%;
+				height: auto;
 				max-width: 15rem;
 				max-height: 15rem;
 				border-radius: 0.6rem;

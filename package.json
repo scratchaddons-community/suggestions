@@ -27,6 +27,7 @@
 		"arctic": "2.3.3",
 		"bottleneck": "2.19.5",
 		"drizzle-orm": "0.38.3",
+		"ioredis": "^5.4.2",
 		"postgres": "3.4.5",
 		"svelte-select": "5.8.3"
 	},

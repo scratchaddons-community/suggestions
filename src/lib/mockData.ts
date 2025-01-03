@@ -26,8 +26,8 @@ export async function mockSuggestion(userId: string): Promise<Suggestion> {
 	return {
 		id: crypto.randomUUID(),
 		authorId: userId,
-		title: `Suggestion ${(Math.random() * 10000).toFixed(0)}`,
-		description: `Description ${(Math.random() * 10000).toFixed(0)}`,
+		title: `Suggestion ${(Math.random() * 10_000).toFixed(0)}`,
+		description: `Description ${(Math.random() * 10_000).toFixed(0)}`,
 		voterIds: getRandomNItems(voterIds as unknown as string[]),
 		imageIds: getRandomNItems(imageIds),
 		tag: (() => {
@@ -57,10 +57,12 @@ export async function mockImage(provider: "placehold" | "picsum" = "picsum"): Pr
 	const url =
 		provider === "placehold"
 			? `https://placehold.co/${width}x${height}`
-			: `https://picsum.photos/seed/${(Math.random() * 10000).toFixed(0)}/${width}/${height}`;
+			: `https://picsum.photos/seed/${(Math.random() * 10_000).toFixed(0)}/${width}/${height}`;
+
 	return {
 		id: crypto.randomUUID(),
 		url,
 		resolution: { x: width, y: height },
+		cloudinaryId: null,
 	};
 }

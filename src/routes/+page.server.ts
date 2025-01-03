@@ -10,7 +10,7 @@ const voteLimiter = new Bottleneck({
 	maxConcurrent: 1,
 	minTime: 200,
 	reservoir: 10,
-	reservoirRefreshInterval: 5000,
+	reservoirRefreshInterval: 5_000,
 	reservoirRefreshAmount: 8,
 	strategy: Bottleneck.strategy.LEAK,
 });
@@ -19,11 +19,11 @@ const pageLimiter = new Bottleneck({
 	maxConcurrent: 1,
 	minTime: 200,
 	reservoir: 10,
-	reservoirRefreshInterval: 10000,
+	reservoirRefreshInterval: 10_000,
 	reservoirRefreshAmount: 20,
 	strategy: Bottleneck.strategy.BLOCK,
 	highWater: 1,
-	penalty: 1000,
+	penalty: 1_000,
 });
 
 const getCountFromDb = async (
@@ -66,7 +66,10 @@ export const load = (async ({ url }) => {
 		return await getSuggestionsFromDb(page, "trending");
 	})();
 
-	const getImages = db.select().from(table.image);
+	const getImages = (async () => {
+		await sleep();
+		return await db.select().from(table.image);
+	})();
 
 	const getCount = getCountFromDb().then(handleCountResponse);
 
@@ -180,8 +183,8 @@ async function getPage(
 		default:
 			sortBy = sql`
 				COALESCE(array_length(${table.suggestion.voterIds}, 1), 0) / 
-				POWER(((EXTRACT(EPOCH FROM NOW()) * 1000) - EXTRACT(EPOCH FROM ${table.suggestion.createdAt}) *1000) /
-				(1000 * 60 * 60 * 24) + 1, 10) DESC
+				POWER(((EXTRACT(EPOCH FROM NOW()) * 1_000) - EXTRACT(EPOCH FROM ${table.suggestion.createdAt}) *1_000) /
+				(1_000 * 60 * 60 * 24) + 1, 10) DESC
 			`;
 			break;
 		case "newest":

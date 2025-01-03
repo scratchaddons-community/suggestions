@@ -1,6 +1,6 @@
 import { dev } from "$app/environment";
 
-export function sleep(ms: number = 2000) {
+export function sleep(ms: number = 2_000) {
 	// Have I been sleeping in PRODUCTION?!?!??!?!
 	return new Promise((resolve) => setTimeout(resolve, dev ? ms : 0));
 }
@@ -45,3 +45,5 @@ export const defaults = {
 };
 
 export const maxImages = 5;
+
+export const DAY_IN_MS = 86_400_000;
