@@ -70,7 +70,7 @@ export const actions: Actions = {
 						);
 						const nsfw = results.includes("yes");
 
-						if (nsfw || disableNsfwCheck) {
+						if (nsfw && !disableNsfwCheck) {
 							await cloudinary.delete(image.cloudinaryId || "", image.id, sveltekitFetch);
 							// Strike user for being an idiot
 							// THAT WAS THE AUTO COMPLETE WHAT 😂😂😂😂😂
