@@ -1,7 +1,5 @@
 name: Update Fork
-on:
-  push:
-    branches: [main]
+on: [push]
 jobs:
   update:
     name: Update Fork
@@ -15,4 +13,4 @@ jobs:
       - name: Push
         run: |
           git remote add target https://github.com/Jazza-231/suggestions.git
-          git push --force target main
+          git push --force target $(git branch --show-current)
