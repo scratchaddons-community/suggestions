@@ -10,15 +10,15 @@
 - [x] Generate a signature on the server using an internal API endpoint
 - [x] Upload image to cloudinary using an XHR request to get progress feedback
 - [x] Update UI with progress
-- [ ] Check if image is SFW
-  - [ ] If not, delete image, show error, take action
+- [x] Check if image is SFW
+  - [x] If not, delete image, show error, take action
 - [x] Receive deletion request from UI
 - [x] Make signature on server and delete based off public_id
 - [x] Add images to database on submit
 
 ## TODO
 
-- [ ] Images do not keep their order
+- [x] Images do not keep their order
 
 ## Features
 

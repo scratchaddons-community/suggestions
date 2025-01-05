@@ -12,7 +12,7 @@ export const load = (async ({ locals: { session }, setHeaders }) => {
 	if (!session) redirect(302, "/login");
 
 	setHeaders({
-		"Cache-Control": "max-age=3_600",
+		"Cache-Control": "max-age=3600",
 	});
 
 	return { tags: tag.enumValues };
@@ -39,7 +39,7 @@ export const actions: Actions = {
 			JSON.parse(formTag as string) as { value: (typeof tag.enumValues)[number]; label: string }
 		).value;
 
-		const imageIds: string[] = [];
+		const imageIds: { cloudinaryId: string; id: string }[] = [];
 
 		if (formImages) {
 			if (formImages?.length > maxImages)
@@ -78,7 +78,7 @@ export const actions: Actions = {
 						}
 
 						const id = crypto.randomUUID();
-						imageIds.push(id);
+						imageIds.push({ cloudinaryId: id, id: image.id });
 
 						await db.insert(table.image).values({
 							id,
@@ -97,6 +97,12 @@ export const actions: Actions = {
 			}
 		}
 
+		if (formImages) {
+			const formImageIds = formImages.map((img) => img.id);
+
+			imageIds.sort((a, b) => formImageIds.indexOf(a.id) - formImageIds.indexOf(b.id));
+		}
+
 		await db.insert(table.suggestion).values({
 			id: crypto.randomUUID(),
 			authorId: user?.id,
@@ -104,7 +110,7 @@ export const actions: Actions = {
 			createdAt: new Date(Date.now()),
 			description: toSentenceCase(formDescription as string | null),
 			tag: parsedTag,
-			imageIds,
+			imageIds: imageIds.map((image) => image.cloudinaryId),
 		});
 
 		return { status: 200, message: "Suggestion added" };

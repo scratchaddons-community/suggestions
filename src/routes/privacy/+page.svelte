@@ -1,11 +1,4 @@
-<script lang="ts">
-	import { fade } from "svelte/transition";
-	import type { PageData } from "./$types";
-
-	let { data }: { data: PageData } = $props();
-</script>
-
-<div class="privacy" in:fade|global={{ duration: 200, delay: 300 }}>
+<div class="privacy">
 	<h1>Privacy Policy</h1>
 
 	<div class="about-you">
