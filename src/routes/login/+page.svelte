@@ -1,8 +1,4 @@
-<script>
-	import { fade } from "svelte/transition";
-</script>
-
-<div class="login" in:fade|global={{ duration: 200, delay: 300 }}>
+<div class="login">
 	<form method="POST">
 		<div class="community">
 			<button formaction="?/scratch">Sign in with Scratch</button>

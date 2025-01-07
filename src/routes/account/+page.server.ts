@@ -5,12 +5,17 @@ import { db } from "$lib/server/db";
 import { mockImage, mockSuggestion } from "$lib/mockData";
 import { table } from "$lib/server";
 
-export const load = (async ({ locals: { user }, setHeaders }) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const load = (async ({ locals: { user }, setHeaders, depends }) => {
 	if (!user) redirect(302, "/login");
 
 	setHeaders({
 		"Cache-Control": "max-age=60",
 	});
+
+	// If we do not want to redirect to / (see the +page.svelte file), uncomment this line. Keeping this line is causes a flash to the
+	// "Sign in" UI before navigating to the root page.
+	// depends("session");
 
 	return { user };
 }) satisfies PageServerLoad;

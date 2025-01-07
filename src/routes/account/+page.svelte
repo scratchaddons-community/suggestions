@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { enhance } from "$app/forms";
-	import { fade } from "svelte/transition";
 	import type { PageData } from "./$types";
 	import { browser } from "$app/environment";
-	import { goto } from "$app/navigation";
+	import { goto, invalidate } from "$app/navigation";
 
 	let { data }: { data: PageData } = $props();
 	const { user } = data;
@@ -15,7 +14,6 @@
 	}
 </script>
 
-<!-- in:fade|global={{ duration: 200, delay: 300 }} -->
 <div class="account">
 	<h1>Hello {user?.displayName || user?.username}!</h1>
 
@@ -26,8 +24,9 @@
 			return async ({ result }) => {
 				if (result.type === "failure") {
 					alert(result.data?.message ?? "Something went wrong");
-					goto("/");
 				}
+				await invalidate("session");
+				goto("/");
 			};
 		}}
 	>
