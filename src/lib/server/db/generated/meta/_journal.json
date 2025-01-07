@@ -15,6 +15,20 @@
       "when": 1735717433807,
       "tag": "0001_sa-suggestions",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1736253948759,
+      "tag": "0002_sa-suggestions",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1736254151825,
+      "tag": "0003_sa-suggestions",
+      "breakpoints": true
     }
   ]
 }
