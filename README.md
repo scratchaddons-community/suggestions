@@ -105,6 +105,6 @@ I recommend setting on cloudinary an incoming transformation that will essential
 `c_limit,w_6000,h_6000,f_webp,q_auto` - Incoming
 `c_limit/w_600/f_avif/q_auto:low/if_h_gt_4000/h_4000/if_end` - Thumbnail
 
-I also recommend deploying this project to **[Vercel](https://vercel.com/)** for production, as I have had issues with Cloudflare Pages. This may have been fixed by now, as I recently removed the Cloudinary package from the images test, which was not runtime agnostic. I'll try it now and report back lol. It totally works, I am a genius.
+I also recommend deploying this project to **[Vercel](https://vercel.com/)** for production, as I have had issues with Cloudflare Pages. This may have been fixed by now, as I recently removed the Cloudinary package from the images test, which was not runtime agnostic. However, it seems that the postgres package I am using is NOT runtime agnostic.
 
 With the expected usage of this project, this should be able to run on free tiers of all services, including Neon, GitHub, Cloudinary, and Vercel.
