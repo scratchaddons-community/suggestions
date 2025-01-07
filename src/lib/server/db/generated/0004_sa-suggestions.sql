@@ -1,0 +1,1 @@
+ALTER TABLE "suggestion" ADD COLUMN "visible" boolean DEFAULT false NOT NULL;

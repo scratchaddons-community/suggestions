@@ -58,6 +58,7 @@ export const suggestion = pgTable("suggestion", {
 		.references(() => image.id)
 		.array(),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).notNull().defaultNow(),
+	visible: boolean("visible").notNull().default(false),
 });
 
 export type Session = typeof session.$inferSelect;
