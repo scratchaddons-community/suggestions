@@ -17,7 +17,8 @@ body {
 	flex-direction: column;
 }
 
-button:not(.omit-styles) {
+button:not(.omit-styles),
+a.button {
 	border: none;
 	padding: 0.5rem;
 	border-radius: 0.5rem;
@@ -44,7 +45,8 @@ button:not(.omit-styles) {
 	}
 }
 
-header button:not(.omit-styles) {
+header button:not(.omit-styles),
+header a.button {
 	background-color: transparent;
 
 	&:hover {

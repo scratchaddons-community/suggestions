@@ -27,17 +27,6 @@
 	function toggleTheme() {
 		setTheme(theme === "dark" ? "light" : "dark");
 	}
-
-	// I love svelte
-	const fakeLink = (href: string) => {
-		return {
-			onclick: () => goto(href),
-			onauxclick: () => window.open(href, "_blank"),
-			onmouseenter: () => preloadData(href),
-			role: "link",
-			"aria-label": toSentenceCase(href.replaceAll("/", "")),
-		};
-	};
 </script>
 
 <header>
@@ -57,21 +46,20 @@
 		<div class="right">
 			{#if !session}
 				<div class="user">
-					<!-- I mean come ON. Spreadable attributes are amazing -->
-					<button class="login button" {...fakeLink("/login")}>Login</button>
+					<a href="/login">Login</a>
 				</div>
 			{:else}
 				<div class="user">
-					<button class="profile button" {...fakeLink("/account")}>
+					<a href="/account" class="profile button">
 						<Profile />
-					</button>
+					</a>
 				</div>
 			{/if}
 
 			<div class="add">
-				<button class="plus button" {...fakeLink("/add")}>
+				<a href="/add" class="plus button">
 					<Add />
-				</button>
+				</a>
 			</div>
 
 			<button class="theme-toggle" onclick={toggleTheme}>
