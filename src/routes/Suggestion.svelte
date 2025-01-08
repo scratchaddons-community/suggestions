@@ -9,7 +9,7 @@
 	type Props = {
 		suggestion: {
 			suggestion: Suggestion;
-			user: Omit<User, "oauthProvider" | "oauthId"> | null;
+			user: { id: string; username: string; displayName: string | null } | null;
 		};
 		getImages: Promise<Image[]>;
 		index: number;
