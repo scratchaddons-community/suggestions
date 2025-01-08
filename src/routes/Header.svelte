@@ -2,12 +2,13 @@
 	import { browser } from "$app/environment";
 	import { goto, preloadData } from "$app/navigation";
 	import { page } from "$app/state";
+	import { toSentenceCase } from "$lib";
 	import { Sun, Moon } from "$lib/icons";
 	import Add from "$lib/icons/Add.svelte";
 	import Profile from "$lib/icons/Profile.svelte";
 	import icon from "$lib/images/icon.svg";
 
-	const { session } = $props();
+	const { session }: { session: App.Locals["session"] } = $props();
 
 	let theme: "dark" | "light" = $state()!;
 	let setTheme: Function = $state()!;
@@ -27,29 +28,16 @@
 		setTheme(theme === "dark" ? "light" : "dark");
 	}
 
-	function login() {
-		if (location.pathname !== "/login") goto("/login");
-	}
-
-	function account() {
-		if (location.pathname !== "/account") goto("/account");
-	}
-
-	function add() {
-		if (location.pathname !== "/add") goto("/add");
-	}
-
-	function preloadAccount() {
-		preloadData("/account");
-	}
-
-	function preloadLogin() {
-		preloadData("/login");
-	}
-
-	function preloadAdd() {
-		preloadData("/add");
-	}
+	// I love svelte
+	const fakeLink = (href: string) => {
+		return {
+			onclick: () => goto(href),
+			onauxclick: () => window.open(href, "_blank"),
+			onmouseenter: () => preloadData(href),
+			role: "link",
+			"aria-label": toSentenceCase(href.replaceAll("/", "")),
+		};
+	};
 </script>
 
 <header>
@@ -67,23 +55,25 @@
 		{/if}
 
 		<div class="right">
-			{#if session}
-				<div class="add">
-					<button class="plus button" onclick={add} onmouseenter={preloadAdd}>
-						<Add />
-					</button>
-				</div>
-
+			{#if !session}
 				<div class="user">
-					<button class="profile button" onclick={account} onmouseenter={preloadAccount}>
-						<Profile />
-					</button>
+					<!-- I mean come ON. Spreadable attributes are amazing -->
+					<button class="login button" {...fakeLink("/login")}>Login</button>
 				</div>
 			{:else}
 				<div class="user">
-					<button class="login button" onclick={login} onmouseenter={preloadLogin}>Login</button>
+					<button class="profile button" {...fakeLink("/account")}>
+						<Profile />
+					</button>
 				</div>
 			{/if}
+
+			<div class="add">
+				<button class="plus button" {...fakeLink("/add")}>
+					<Add />
+				</button>
+			</div>
+
 			<button class="theme-toggle" onclick={toggleTheme}>
 				<div class="sun">
 					<Sun />

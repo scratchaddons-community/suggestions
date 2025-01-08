@@ -1,12 +1,18 @@
 <script lang="ts">
 	import { enhance } from "$app/forms";
 	import Select from "svelte-select";
-	import { labels } from "$lib";
+	import { labels, sleep } from "$lib";
 	import { goto } from "$app/navigation";
 	import Cloudinary from "./Cloudinary.svelte";
+	import { tags } from "$lib/db/enums";
 
 	const { data } = $props();
-	const { tags } = data;
+	if (!data.session) {
+		// Currently this causes a flash as the alert stops the rendering, and then the goto runs immediately
+		// This won't be an issue when I move to a custom popup instead of using alert
+		alert("You need to be signed in to add suggestions. Redirecting you to the login page.");
+		goto("/login");
+	}
 
 	const allTags = [...tags];
 	const selectOptions = allTags.map((tag) => ({ value: tag, label: labels[tag] }));

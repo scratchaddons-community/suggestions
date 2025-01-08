@@ -1,21 +1,25 @@
 import { maxImages, toSentenceCase } from "$lib";
 import { table } from "$lib/server";
 import { db } from "$lib/server/db";
-import { tag, type Image } from "$lib/server/db/schema";
-import { fail, redirect, type Actions } from "@sveltejs/kit";
+import { type Image } from "$lib/server/db/schema";
+import { fail, type Actions } from "@sveltejs/kit";
 import type { PageServerLoad } from "../$types";
 import { cloudinary } from "$lib/cloudinary/interact";
+import { eq } from "drizzle-orm";
+import type { tags } from "$lib/db/enums";
 
 const disableNsfwCheck = true;
 
-export const load = (async ({ locals: { session }, setHeaders }) => {
-	if (!session) redirect(302, "/login");
-
+export const load = (async ({ setHeaders }) => {
+	// Sveltekit sends a request for the data from this load function if a +page.server.ts file exists, regardless of whether this
+	// load function ACTUALLY exists. If I remove this load function which ONLY exists to set the cache-control header, then the
+	// navigation to this page would be a lot slower, despite no data being fetched at all. 86400 seconds is a day. Not smth crazy like a year
+	// just in case we do eventually return smth in this load function, we don't want the user's browsers caching the empty response
+	// never knowing there is now actual data. This was originally used to pass the enum values for suggestion types or smth, and for redirecting
+	// to the login page if the user is not logged in, but that can be done client side now.
 	setHeaders({
-		"Cache-Control": "max-age=3600",
+		"Cache-Control": "max-age=86400",
 	});
-
-	return { tags: tag.enumValues };
 }) satisfies PageServerLoad;
 
 export const actions: Actions = {
@@ -36,7 +40,7 @@ export const actions: Actions = {
 			return fail(400, { message: "Description too short or too long" });
 
 		const parsedTag = (
-			JSON.parse(formTag as string) as { value: (typeof tag.enumValues)[number]; label: string }
+			JSON.parse(formTag as string) as { value: (typeof tags)[number]; label: string }
 		).value;
 
 		const imageIds: { cloudinaryId: string; id: string }[] = [];
@@ -102,6 +106,11 @@ export const actions: Actions = {
 
 			imageIds.sort((a, b) => formImageIds.indexOf(a.id) - formImageIds.indexOf(b.id));
 		}
+
+		const trusted =
+			(await db.select().from(table.user).where(eq(table.user.id, user.id)))[0].role === "trusted";
+
+		console.log(trusted);
 
 		await db.insert(table.suggestion).values({
 			id: crypto.randomUUID(),

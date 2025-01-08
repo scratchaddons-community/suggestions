@@ -7,6 +7,8 @@ import { GitHub } from "arctic";
 import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, OAUTH_CALLBACK_URL } from "$env/static/private";
 import { DAY_IN_MS } from "$lib";
 
+export type SessionValidationResult = Awaited<ReturnType<typeof validateSessionToken>>;
+
 export const sessionCookieName = "auth-session";
 
 export function generateSessionToken() {
