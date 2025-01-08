@@ -32,6 +32,10 @@ a.button {
 	background-color: var(--brand);
 	color: var(--text-on-brand);
 
+	&:is(a) {
+		text-decoration: none;
+	}
+
 	&:hover:not(:disabled) {
 		transform: scale(1.1);
 	}

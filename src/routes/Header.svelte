@@ -31,22 +31,15 @@
 
 <header>
 	<nav>
-		{#if typeof suggestionsPage !== "undefined"}
-			<a href="/" class="icon" data-sveltekit-reload>
-				<img src={icon} alt="Scratch Addons" />
-				<span>Scratch Addons Suggestions</span>
-			</a>
-		{:else}
-			<a href="/" class="icon">
-				<img src={icon} alt="Scratch Addons" />
-				<span>Scratch Addons Suggestions</span>
-			</a>
-		{/if}
+		<a href="/" class="icon" data-sveltekit-reload={typeof suggestionsPage !== "undefined"}>
+			<img src={icon} alt="Scratch Addons" width="150" height="150" />
+			<span>Scratch Addons Suggestions</span>
+		</a>
 
 		<div class="right">
 			{#if !session}
 				<div class="user">
-					<a href="/login">Login</a>
+					<a href="/login" class="login button">Login</a>
 				</div>
 			{:else}
 				<div class="user">

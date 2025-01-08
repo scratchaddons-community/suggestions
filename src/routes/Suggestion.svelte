@@ -161,7 +161,7 @@
 						}}
 						width={image.resolution?.x}
 						height={image.resolution?.y}
-						loading="lazy"
+						loading={index > 2 ? "lazy" : "eager"}
 					/>
 				</div>
 			{/if}

@@ -5,9 +5,12 @@ import { encodeBase64 } from "@oslojs/encoding";
 import type { PageServerLoad } from "./$types";
 import { OAUTH_CALLBACK_URL } from "$env/static/private";
 
-export const load = (async ({ locals: { session } }) => {
+export const load = (async ({ locals: { session }, setHeaders }) => {
 	if (session) redirect(302, "/account");
 
+	setHeaders({
+		"Cache-Control": "max-age=3600",
+	});
 	return {};
 }) satisfies PageServerLoad;
 

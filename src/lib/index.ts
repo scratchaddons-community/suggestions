@@ -1,6 +1,6 @@
 import { dev } from "$app/environment";
 
-export function sleep(ms: number = 1_000) {
+export function sleep(ms: number = 0) {
 	// Have I been sleeping in PRODUCTION?!?!??!?!
 	return new Promise((resolve) => setTimeout(resolve, dev ? ms : 0));
 }
