@@ -22,6 +22,7 @@
 	"dependencies": {
 		"@oslojs/crypto": "1.0.1",
 		"@oslojs/encoding": "1.1.0",
+		"@sveltejs/adapter-auto": "^4.0.0",
 		"@vercel/analytics": "1.4.1",
 		"@vercel/speed-insights": "1.1.0",
 		"arctic": "3.1.0",
@@ -34,7 +35,6 @@
 	},
 	"devDependencies": {
 		"@eslint/js": "9.17.0",
-		"@sveltejs/adapter-vercel": "5.5.2",
 		"@sveltejs/kit": "2.15.2",
 		"@sveltejs/vite-plugin-svelte": "5.0.3",
 		"@types/node": "^22.10.5",
