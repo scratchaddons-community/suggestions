@@ -4,7 +4,7 @@
 	import type { Image, Session, Suggestion, User } from "$lib/server/db/schema";
 	import { fade, fly } from "svelte/transition";
 	import { labels } from "$lib";
-	import { generateUrl } from "$lib/cloudinary/url";
+	import { generateUrl, getTransformedResolutions } from "$lib/cloudinary/url";
 
 	type Props = {
 		suggestion: {
@@ -145,6 +145,12 @@
 				{@const url = image.cloudinaryId
 					? generateUrl(image.cloudinaryId, undefined, "thumbnail")
 					: image.url}
+
+				{@const dimensions = getTransformedResolutions({
+					width: image.resolution?.x,
+					height: image.resolution?.y,
+				})}
+
 				<div class="images">
 					<!-- svelte-ignore a11y_missing_attribute -->
 					<img
@@ -159,8 +165,8 @@
 							failed.textContent = "Failed to load image sowwy";
 							target.after(failed);
 						}}
-						width={image.resolution?.x}
-						height={image.resolution?.y}
+						width={dimensions?.width || image.resolution?.x}
+						height={dimensions?.height || image.resolution?.y}
 						loading={index > 2 ? "lazy" : "eager"}
 					/>
 				</div>
@@ -289,7 +295,8 @@
 
 			img {
 				width: 100%;
-				height: auto;
+				/* This piece of shit ruined my CLS score */
+				/* height: auto; */
 				max-width: 15rem;
 				max-height: 15rem;
 				border-radius: 0.6rem;

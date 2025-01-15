@@ -85,7 +85,7 @@
 
 			await compress(file, null, "preprocess")
 				.then((compressedFile) => {
-					if (compressedFile.size < file.size) newCompressedFile = compressedFile;
+					newCompressedFile = compressedFile;
 
 					console.log(
 						`Saved ${file.size - compressedFile.size} bytes, or ${((file.size - compressedFile.size) / file.size) * 100}%`,

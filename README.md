@@ -92,7 +92,7 @@ I'll do this later, rn I'm emotional, hungry, and tired. Future me, give instruc
 
 I ~~recommend setting on cloudinary an incoming transformation that will essentially limit the size of the image and set the format and quality to something reasonable. This WILL cost you a transform for every uploaded image, but it will also reduce the file size that you need to store.~~ I have instead implemented client side compression, which saves not only a transformation, but also a lot of bandwidth, for cloudinary, and the user, making large images upload MUCH faster. This IS client side, which means it can be bypassed if the client code is modified, but there is still a server side enforced limit of 10MB, and a max of 5 images per suggestion. I will keep the thumbnail generation in cloudinary, as that is something which is important to be enforced.
 
-`c_limit/w_600/f_avif/q_auto:low/if_h_gt_4000/h_4000/if_end` - Thumbnail transformation
+`c_limit/if_w_gt_600/w_600/if_end/f_avif/q_auto:low/if_h_gt_4000/h_4000/if_end` - Thumbnail transformation, update the "getTransformedResolutions" function if you change this transformation, which is found in [src/lib/cloudinary/url.ts](src/lib/cloudinary/url.ts).
 
 I also recommend deploying this project to **[Vercel](https://vercel.com/)** for production, as I have had issues with Cloudflare Pages. This may have been fixed by now, as I recently removed the Cloudinary package from the images test, which was not runtime agnostic. However, it seems that the postgres package I am using is NOT runtime agnostic.
 

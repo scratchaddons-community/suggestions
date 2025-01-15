@@ -15,6 +15,7 @@ export async function compress(
 				maxHeight: 6000,
 				mimeType: "image/webp",
 				quality: 0.9,
+				strict: true,
 			};
 		}
 
