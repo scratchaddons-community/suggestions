@@ -83,13 +83,21 @@
 			<li>
 				<strong>Cloudinary:</strong> We use Cloudinary to host and serve images on the site. While this
 				service helps ensure fast and reliable delivery of images, no personal data is stored or shared
-				with Cloudinary.
+				with Cloudinary beyond images you choose to upload. In some cases, when you delete an image,
+				the image is not removed from Cloudinary. This may be for moderation purposes, or technical issues.
+				If you would like a specific image that you have uploaded to be removed, or that infringes on
+				your copyright, please contact us.
 			</li>
 			<li>
 				<strong>Neon:</strong> We use Neon to manage our database, which securely stores limited user
 				data (like usernames, IDs, and display names), or suggestion-related data. Neon is a cloud-based
 				database platform that prioritizes security and reliability. The data stored is minimal and strictly
-				necessary for the functionality of the site.
+				necessary for the functionality of the site, and is outlined above.
+			</li>
+			<li>
+				<strong>Upstash:</strong> We use Upstash to manage our Redis database, which stores session data
+				and basic user data. The data stored is minimal and strictly necessary for the site to be as
+				performant for the end user as possible.
 			</li>
 		</ul>
 
@@ -104,16 +112,19 @@
 			<li>
 				<a href="https://neon.tech/privacy-policy" target="_blank">Neon Privacy Policy</a>
 			</li>
+			<li>
+				<a href="https://upstash.com/trust/privacy.pdf" target="_blank"
+					>Upstash Privacy Policy PDF</a
+				>
+			</li>
 		</ul>
 
 		<h2>Contact Us</h2>
 		<p>
 			If you have any questions or concerns about our privacy policy, please contact us. As of now,
-			this website is only being worked on by <a
-				href="https://github.com/Jazza-231/"
-				target="_blank"
-				>Jazza
-			</a>. As such, if you have any questions, you can email me at
+			this website is only being worked on by
+			<a href="https://github.com/Jazza-231/" target="_blank">Jazza </a>. As such, if you have any
+			questions, you can email me at
 			<a href="mailto:admin@jazza.dev"> admin@jazza.dev </a>.
 		</p>
 	</div>
@@ -129,6 +140,10 @@
 		div {
 			width: 50rem;
 			max-width: 90%;
+
+			ul li {
+				margin-bottom: 0.5rem;
+			}
 		}
 	}
 </style>

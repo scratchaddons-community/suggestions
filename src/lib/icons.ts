@@ -17,5 +17,6 @@ export { default as Load } from "./icons/Load.svelte";
 export { default as Profile } from "./icons/Profile.svelte";
 export { default as Add } from "./icons/Add.svelte";
 export { default as Delete } from "./icons/Delete.svelte";
+export { default as Compare } from "./icons/Compare.svelte";
 
 export { default as SA } from "./icons/SA.svelte";

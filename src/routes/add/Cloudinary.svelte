@@ -4,6 +4,7 @@
 	import { cubicInOut } from "svelte/easing";
 	import { Delete } from "$lib/icons";
 	import { maxImages, maxImageSize } from "$lib";
+	import { compress } from "$lib/images/compress";
 
 	const { updateImages } = $props();
 
@@ -70,17 +71,40 @@
 
 		for (const file of files) {
 			if (file.size > maxImageSize) {
-				alert(`You can only upload images smaller than ${maxImageSize / 1_000_000}MB`);
-				continue;
+				alert(
+					`You can only upload images smaller than ${maxImageSize / 1_000_000}MB. We will try to compress it.`,
+				);
 			}
 
 			const id = crypto.randomUUID();
 
 			addImage(id, file.name, await file.arrayBuffer());
+			let newCompressedFile: File | null = null;
+
+			updateImage(id, { base64: URL.createObjectURL(file) });
+
+			await compress(file, null, "preprocess")
+				.then((compressedFile) => {
+					if (compressedFile.size < file.size) newCompressedFile = compressedFile;
+
+					console.log(
+						`Saved ${file.size - compressedFile.size} bytes, or ${((file.size - compressedFile.size) / file.size) * 100}%`,
+					);
+					console.log(
+						`From ${(file.size / 1024).toFixed(2)} KB to ${(compressedFile.size / 1024).toFixed(2)} KB`,
+					);
+				})
+				.catch((error: Error) => {
+					console.error("Compression failed:", error.message);
+				});
+
+			if ((newCompressedFile || file).size > maxImageSize) {
+				alert("We tried compressing your image, but it was still too large.");
+				continue;
+			}
 
 			try {
 				const reader = new FileReader();
-
 				const imageData = await new Promise<string>((resolve, reject) => {
 					reader.onload = () => {
 						const imageData = reader.result as string;
@@ -88,7 +112,7 @@
 						resolve(imageData as string);
 					};
 					reader.onerror = reject;
-					reader.readAsDataURL(file);
+					reader.readAsDataURL(newCompressedFile || file);
 				});
 
 				cloudinary
@@ -240,6 +264,7 @@
 				width: 100%;
 				height: 100%;
 				border-radius: 0.5rem;
+				pointer-events: none;
 
 				rect {
 					stroke: var(--brand);

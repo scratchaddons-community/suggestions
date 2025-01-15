@@ -58,7 +58,7 @@ Now, the reason I am writing this readme...
 
 - [ ] Rewrite the services section to differentiate instructions between production and development
 - [ ] Replace all alerts with toasts (both blocking and non-blocking) - [why?](https://www.telerik.com/blogs/how-to-do-javascript-alerts-without-being-a-jerk)
-- [ ] Add Upstash to the privacy policy
+- [x] Add Upstash to the privacy policy
 - [ ] Add a new display mode to show more suggestions compactly
 - [x] Find a way to improve performance? I'm sure my database queries suck
 - [x] This includes streaming of data on main page, and not invalidating data on nav to account or add suggestion, i think cuz in the page load it checks for the user from locals
@@ -75,36 +75,24 @@ Now, the reason I am writing this readme...
 - [ ] Basic image editing such as cropping or adding arrows and circles
 - [ ] Add a status for what version something is being added in.
 - [ ] Compact mode, remove images and less useful info
+- [x] Client side compression
 
 ## Services
 
-To run this project, you will need the following additional services:
+You will need the following services for development and/or production:
 
 - [Neon](https://neon.tech/)
 - [Upstash](https://upstash.com/)
-- [A GitHub OAUTH application](https://github.com/settings/applications/new)
+- [A GitHub OAuth application x2](https://github.com/settings/applications/new)
 - [Cloudinary](https://cloudinary.com/)
 
-Create a **Neon** account, and then create a new project. Choose a name and postgres version 17. You will be redirected to `https://console.neon.tech/app/projects/<project-name>/quickstart`, where you can easily copy the postgres snippet, and paste this into the .env file.
+I'll do this later, rn I'm emotional, hungry, and tired. Future me, give instructions on how to set up the services for both ## Development and ## Production. Specify stuff like OAuth x2 because of the callback url.
 
-Create a **Upstash** account, and then create a new Redis database. You should be redirected to `https://console.upstash.com/redis/<something></something>?tab=details&teamid=0`, where you can easily copy the endpoint, password, and port, and paste that into the appropriate places in the .env file.
+## Other
 
-For the **GitHub OAUTH application**, follow the above link and create a new application. Choose a name, set the homepage URL to `http://localhost:5173`, and the callback URL to `http://localhost:5173/auth/callback/`. Make sure the value in the .env file is set to this callback URL.
+I ~~recommend setting on cloudinary an incoming transformation that will essentially limit the size of the image and set the format and quality to something reasonable. This WILL cost you a transform for every uploaded image, but it will also reduce the file size that you need to store.~~ I have instead implemented client side compression, which saves not only a transformation, but also a lot of bandwidth, for cloudinary, and the user, making large images upload MUCH faster. This IS client side, which means it can be bypassed if the client code is modified, but there is still a server side enforced limit of 10MB, and a max of 5 images per suggestion. I will keep the thumbnail generation in cloudinary, as that is something which is important to be enforced.
 
-Note: This is for development. Replace with whatever your domain is in production when actually deploying.
-
-Create a **Cloudinary** account. Choose "Coding with APIs and SDKs". Navigate to settings, and then to "Product Environments" under "Account settings". Choose the three dots next to "Active" and select "Edit". Set your cloud name to whatever you would like, and save changes.
-
-Then, go to the "API Keys" tab under "Product environment settings", and copy the following to your .env file:
-
-- Cloud name: at the top of the page next to the heading "API Keys" in blue
-- API key: In the middle of the page, you can't miss it.
-- API secret: Hover over the redacted secret and click the eye icon to the right of it. Confirm your password, and then press the copy button that appears next to the eye icon.
-
-I recommend setting on cloudinary an incoming transformation that will essentially limit the size of the image and set the format and quality to something reasonable. This WILL cost you a transform for every uploaded image, but it will also reduce the file size that you need to store. You can also set an eager transform for creating the thumbnails, but this will cost you a transform for every image, even ones that the user deletes instantly. It is worth it only for the incoming transform.
-
-`c_limit,w_6000,h_6000,f_webp,q_auto` - Incoming
-`c_limit/w_600/f_avif/q_auto:low/if_h_gt_4000/h_4000/if_end` - Thumbnail
+`c_limit/w_600/f_avif/q_auto:low/if_h_gt_4000/h_4000/if_end` - Thumbnail transformation
 
 I also recommend deploying this project to **[Vercel](https://vercel.com/)** for production, as I have had issues with Cloudflare Pages. This may have been fixed by now, as I recently removed the Cloudinary package from the images test, which was not runtime agnostic. However, it seems that the postgres package I am using is NOT runtime agnostic.
 
