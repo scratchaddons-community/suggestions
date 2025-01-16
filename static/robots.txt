@@ -17,6 +17,6 @@
 #  \______________________________/
 
 User-agent: *
-Disallow: /
+Allow: /
 
 # Shamelessly stolen from cloudflare
