@@ -8,6 +8,7 @@
 	import { browser } from "$app/environment";
 
 	const { updateImages } = $props();
+	let dropArea: HTMLDivElement | undefined = $state();
 
 	let images: App.Image[] = $state([]);
 	$inspect(images);
@@ -175,16 +176,29 @@
 			handleFiles(files);
 		});
 	}
+
+	function draggingClass(e: DragEvent, add: boolean = true) {
+		e.preventDefault();
+		if (!dropArea) return;
+
+		dropArea.classList.toggle("dragging", add);
+	}
 </script>
 
 <div
 	class="drop"
-	ondragover={(e) => {
-		e.preventDefault();
+	ondragover={draggingClass}
+	ondragenter={draggingClass}
+	ondragleave={(e) => {
+		draggingClass(e, false);
 	}}
-	ondrop={handleDropImages}
+	ondrop={(e) => {
+		draggingClass(e, false);
+		handleDropImages(e);
+	}}
 	role="none"
 	onclick={handleAddImages}
+	bind:this={dropArea}
 >
 	<span class="add">Add images</span>
 	<span class="more">Drag and drop, click to browse, or paste an image/link</span>
@@ -225,6 +239,8 @@
 						<span class="progress">
 							{image.progressTween?.current?.toFixed()}%
 						</span>
+					{:else if image.status === undefined}
+						<span class="waiting"> Compressing... </span>
 					{/if}
 				</span>
 
@@ -273,7 +289,8 @@
 			max-width: 24rem;
 			padding: 0.35rem;
 
-			.progress {
+			.progress,
+			.waiting {
 				position: absolute;
 				z-index: 2;
 				font-size: 1.2rem;
@@ -361,6 +378,11 @@
 		border-radius: 0.5rem;
 		flex-direction: column;
 
+		transition: background-color var(--transition-short);
+		&:global(.dragging) {
+			background-color: var(--surface1);
+		}
+
 		@media (width <= 768px) {
 			width: 90%;
 			height: 13rem;
@@ -369,6 +391,7 @@
 		span {
 			font-size: 1.5rem;
 			text-align: center;
+			pointer-events: none;
 
 			&.more {
 				font-size: 1rem;
