@@ -5,6 +5,7 @@
 	import { Delete } from "$lib/icons";
 	import { maxImages, maxImageSize } from "$lib";
 	import { compress } from "$lib/images/compress";
+	import { browser } from "$app/environment";
 
 	const { updateImages } = $props();
 
@@ -68,6 +69,8 @@
 			alert(`You can only upload ${maxImages} images`);
 			return;
 		}
+
+		if (files.length === 0) return;
 
 		for (const file of files) {
 			if (file.size > maxImageSize) {
@@ -150,6 +153,28 @@
 			}
 		}
 	}
+
+	if (browser) {
+		addEventListener("paste", (event) => {
+			event.preventDefault();
+
+			const items = event.clipboardData?.items;
+			if (!items) return;
+
+			const files: File[] = [];
+
+			for (const item of items) {
+				if (item.type.startsWith("image/")) {
+					const file = item.getAsFile();
+					if (!file) return;
+
+					files.push(file);
+				}
+			}
+
+			handleFiles(files);
+		});
+	}
 </script>
 
 <div
@@ -161,7 +186,8 @@
 	role="none"
 	onclick={handleAddImages}
 >
-	<span>Add Images</span>
+	<span class="add">Add images</span>
+	<span class="more">Drag and drop, click to browse, or paste an image/link</span>
 </div>
 
 <div class="images">
@@ -333,6 +359,7 @@
 		align-items: center;
 		justify-content: center;
 		border-radius: 0.5rem;
+		flex-direction: column;
 
 		@media (width <= 768px) {
 			width: 90%;
@@ -341,6 +368,13 @@
 
 		span {
 			font-size: 1.5rem;
+			text-align: center;
+
+			&.more {
+				font-size: 1rem;
+				color: var(--unimportant-text);
+				transition: color var(--transition-short);
+			}
 
 			@media (width <= 768px) {
 				font-size: 1.3rem;

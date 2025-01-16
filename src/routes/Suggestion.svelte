@@ -66,7 +66,7 @@
 	in:fly|global={{ duration: 400, y: 100, delay: index * 100 }}
 	onoutrostart={(e) => {
 		// Something REALLY odd happens...sometimes the next page starts rendering before the transition is finished. It happens genuinely randomly...
-		// So I do this just in case lol, currently removed because I added a transition with a delay
+		// So I do this just in case lol - sometimes
 		// @ts-ignore
 		// e.target.parentElement.parentElement.style = `
 		// height: 0;
