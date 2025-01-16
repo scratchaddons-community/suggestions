@@ -72,7 +72,7 @@ Now, the reason I am writing this readme...
 - [ ] Add linking to other suggestions when marking as a dupe
 - [ ] Add page numbers
 - [ ] Add search params for things like pages, sorting, etc
-- [ ] Basic image editing such as cropping or adding arrows and circles
+- [ ] Basic image editing such as cropping or adding arrows and circles?
 - [ ] Add a status for what version something is being added in.
 - [ ] Compact mode, remove images and less useful info
 - [x] Client side compression
@@ -90,7 +90,7 @@ I'll do this later, rn I'm emotional, hungry, and tired. Future me, give instruc
 
 ## Other
 
-I ~~recommend setting on cloudinary an incoming transformation that will essentially limit the size of the image and set the format and quality to something reasonable. This WILL cost you a transform for every uploaded image, but it will also reduce the file size that you need to store.~~ I have instead implemented client side compression, which saves not only a transformation, but also a lot of bandwidth, for cloudinary, and the user, making large images upload MUCH faster. This IS client side, which means it can be bypassed if the client code is modified, but there is still a server side enforced limit of 10MB, and a max of 5 images per suggestion. I will keep the thumbnail generation in cloudinary, as that is something which is important to be enforced.
+~~I recommend setting on cloudinary an incoming transformation that will essentially limit the size of the image and set the format and quality to something reasonable. This WILL cost you a transform for every uploaded image, but it will also reduce the file size that you need to store.~~ I have instead implemented client side compression, which saves not only a transformation, but also a lot of bandwidth, for cloudinary, and the user, making large images upload MUCH faster. This IS client side, which means it can be bypassed if the client code is modified, but there is still a server side enforced limit of 10MB, and a max of 5 images per suggestion. I will keep the thumbnail generation in cloudinary, as that is something which is important to be enforced.
 
 `c_limit/if_w_gt_600/w_600/if_end/f_avif/q_auto:low/if_h_gt_4000/h_4000/if_end` - Thumbnail transformation, update the "getTransformedResolutions" function if you change this transformation, which is found in [src/lib/cloudinary/url.ts](src/lib/cloudinary/url.ts).
 
