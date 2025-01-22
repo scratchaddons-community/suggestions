@@ -164,6 +164,8 @@
 							const failed = document.createElement("span");
 							failed.textContent = "Failed to load image sowwy";
 							target.after(failed);
+
+							target.style.width = "0px";
 						}}
 						width={dimensions?.width || image.resolution?.x}
 						height={dimensions?.height || image.resolution?.y}
@@ -305,6 +307,31 @@
 				box-shadow: -0.4rem 0.4rem 1rem 0 rgba(0, 0, 0, 0.4);
 				object-fit: cover;
 			}
+		}
+	}
+
+	.left {
+		display: flex;
+		flex-direction: column;
+
+		.description p {
+			white-space: break-spaces;
+			overflow-wrap: anywhere;
+			overflow: hidden;
+			text-overflow: ellipsis;
+
+			display: -webkit-box;
+			-webkit-box-orient: vertical;
+			-webkit-line-clamp: 5;
+			line-clamp: 5;
+		}
+
+		form {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+			justify-content: flex-end;
+			align-items: flex-start;
 		}
 	}
 

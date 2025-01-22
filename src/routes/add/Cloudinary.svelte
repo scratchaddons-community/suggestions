@@ -3,7 +3,7 @@
 	import { Tween } from "svelte/motion";
 	import { cubicInOut } from "svelte/easing";
 	import { Delete } from "$lib/icons";
-	import { maxImages, maxImageSize } from "$lib";
+	import { isImageUrl, maxImages, maxImageSize } from "$lib";
 	import { compress } from "$lib/images/compress";
 	import { browser } from "$app/environment";
 
@@ -157,7 +157,7 @@
 
 	if (browser) {
 		addEventListener("paste", (event) => {
-			event.preventDefault();
+			if (event.clipboardData?.types.includes("Files")) event.preventDefault();
 
 			const items = event.clipboardData?.items;
 			if (!items) return;
@@ -170,6 +170,14 @@
 					if (!file) return;
 
 					files.push(file);
+				} else if (item.type.startsWith("text")) {
+					item.getAsString(async (text) => {
+						console.log(text);
+						if (!text) return;
+						if (!(await isImageUrl(text))) return;
+
+						// For now, I am not allowing image links
+					});
 				}
 			}
 
